@@ -10,7 +10,9 @@ public interface ProductManager {
 
     void deleteProduct(long productId);
 
-    void updateProduct(long productId, BigDecimal newPrice, int newQuantity);
+    void updateProductPrice(long productId, BigDecimal newPrice);
+
+    void updateProductQuantity(long productId, int newQuantity);
 
     Map<Long, Product> getAllProducts();
 }
