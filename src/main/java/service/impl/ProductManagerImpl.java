@@ -1,6 +1,8 @@
 package service.impl;
 
 import entity.Product;
+import exception.InvalidPriceException;
+import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import repository.ProductRepository;
@@ -27,16 +29,30 @@ public class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public void updateProduct(long productId, BigDecimal newPrice, int newQuantity) {
+    public void updateProductPrice(long productId, BigDecimal newPrice) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
 
-        if (newPrice != null && newPrice.compareTo(BigDecimal.ZERO) > 0) {
-            product.setPrice(newPrice);
+        if (newPrice == null) {
+            throw new InvalidPriceException("Nie podałeś ceny");
         }
 
-        if (newQuantity > 0) {
+        if (newPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidPriceException("Cena musi być większa od 0");
+        }
+
+        product.setPrice(newPrice);
+    }
+
+    @Override
+    public void updateProductQuantity(long productId, int newQuantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+
+        if (newQuantity >= 0) {
             product.setQuantity(newQuantity);
+        } else {
+            throw new InvalidQuantityException("Dostępna ilość produktu nie może być mniejsza niż 0");
         }
     }
 
