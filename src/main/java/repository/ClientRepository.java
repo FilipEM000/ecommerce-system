@@ -3,11 +3,13 @@ package repository;
 import entity.Client;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class ClientRepository {
-    private Map<Long, Client> clients;
+    private Map<Long, Client> clients = new HashMap<>();
+    private Long clientCounter = 0L;
 
     public void save(Client client){
         client.setId(getNextId());
@@ -18,7 +20,7 @@ public class ClientRepository {
         clients.remove(client.getId());
     }
 
-    public Optional<Client> findById(long clientId){
+    public Optional<Client> findById(Long clientId){
         return Optional.ofNullable(clients.get(clientId));
     }
 
@@ -26,7 +28,7 @@ public class ClientRepository {
         return Collections.unmodifiableMap(clients);
     }
 
-    public long getNextId(){
-        return clients.size()+1;
+    public Long getNextId(){
+        return clientCounter++;
     }
 }

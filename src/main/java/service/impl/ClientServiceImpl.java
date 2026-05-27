@@ -4,10 +4,10 @@ import entity.Client;
 import exception.ClientNotFoundException;
 import lombok.AllArgsConstructor;
 import repository.ClientRepository;
-import service.ClientManager;
+import service.ClientService;
 
 @AllArgsConstructor
-public class ClientManagerImpl implements ClientManager {
+public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
 
     @Override
@@ -16,9 +16,9 @@ public class ClientManagerImpl implements ClientManager {
     }
 
     @Override
-    public void deleteClient(long clientId) {
+    public void deleteClient(Long clientId) {
         Client client = clientRepository.findById(clientId)
-                .orElseThrow(() -> new ClientNotFoundException("Nie znalezioni klienta o id " + clientId));
+                .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta o id " + clientId));
 
         clientRepository.remove(client);
     }
