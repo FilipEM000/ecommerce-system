@@ -12,7 +12,7 @@ public class Computer extends Product {
     private ProcessorType processor;
     private Ram ram;
 
-    public Computer(long id, String name, BigDecimal price, int quantity) {
+    public Computer(Long id, String name, BigDecimal price, Integer quantity) {
         super(id, name, price, quantity);
         this.processor = ProcessorType.AMD_RYZEN_5;
         this.ram = new Ram(16, 3200, 2);

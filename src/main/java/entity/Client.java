@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter()
 public class Client {
-    private long id;
+    private Long id;
     private String name;
     private String email;
     @Setter(AccessLevel.NONE)

@@ -6,13 +6,13 @@ import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import repository.ProductRepository;
-import service.ProductManager;
+import service.ProductService;
 
 import java.math.BigDecimal;
 import java.util.Map;
 
 @AllArgsConstructor
-public class ProductManagerImpl implements ProductManager {
+public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
@@ -21,7 +21,7 @@ public class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public void deleteProduct(long productId) {
+    public void deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
 
@@ -29,7 +29,7 @@ public class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public void updateProductPrice(long productId, BigDecimal newPrice) {
+    public void updateProductPrice(Long productId, BigDecimal newPrice) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
 
@@ -45,7 +45,7 @@ public class ProductManagerImpl implements ProductManager {
     }
 
     @Override
-    public void updateProductQuantity(long productId, int newQuantity) {
+    public void updateProductQuantity(Long productId, int newQuantity) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
 
