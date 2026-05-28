@@ -1,4 +1,4 @@
-package entity;
+package entity.client;
 
 
 import lombok.AccessLevel;

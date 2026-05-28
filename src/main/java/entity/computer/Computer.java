@@ -14,12 +14,22 @@ public class Computer extends Product {
 
     public Computer(Long id, String name, BigDecimal price, Integer quantity) {
         super(id, name, price, quantity);
-        this.processor = ProcessorType.AMD_RYZEN_5;
-        this.ram = new Ram(16, 3200, 2);
+        this.processor = ProcessorType.INTEL_CORE_I5;
+        this.ram = Ram.DDR4_8_2400;
     }
 
     public void configure(ProcessorType processor, Ram ram) {
         this.processor = processor;
         this.ram = ram;
+    }
+
+    @Override
+    public BigDecimal getTotalPrice(){
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        totalPrice = totalPrice.add(processor.getAdditionalCost());
+        totalPrice = totalPrice.add(ram.getAdditionalCost());
+
+        return super.getTotalPrice().add(totalPrice);
     }
 }

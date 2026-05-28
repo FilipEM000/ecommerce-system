@@ -1,6 +1,6 @@
 package service.impl;
 
-import entity.Client;
+import entity.client.Client;
 import exception.ClientNotFoundException;
 import lombok.AllArgsConstructor;
 import repository.ClientRepository;

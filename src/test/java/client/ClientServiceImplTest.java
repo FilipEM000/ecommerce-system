@@ -30,6 +30,6 @@ public class ClientServiceImplTest {
 
         assertThatExceptionOfType(ClientNotFoundException.class)
                 .isThrownBy(() -> clientManagerImpl.deleteClient(1L))
-                .extracting(ClientNotFoundException::getMessage).isEqualTo("Nie znalezioni klienta o id 1");
+                .extracting(ClientNotFoundException::getMessage).isEqualTo("Nie znaleziono klienta o id 1");
     }
 }

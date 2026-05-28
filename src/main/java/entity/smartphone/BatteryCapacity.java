@@ -3,12 +3,15 @@ package entity.smartphone;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @AllArgsConstructor
 public enum BatteryCapacity {
-    SMALL(3500),
-    STANDARD(4500),
-    LARGE(5500);
+    SMALL(3500, BigDecimal.ZERO),
+    STANDARD(4500, new BigDecimal("50")),
+    LARGE(5500, new BigDecimal("100"));
 
-    private final int capacityInmAh;
+    private final Integer capacityInmAh;
+    private final BigDecimal additionalCost;
 }

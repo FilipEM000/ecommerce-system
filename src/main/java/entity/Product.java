@@ -12,4 +12,8 @@ public abstract class Product {
     private final String name;
     private BigDecimal price;
     private int quantity;
+
+    public BigDecimal getTotalPrice() {
+        return price;
+    }
 }
