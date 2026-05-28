@@ -18,7 +18,7 @@ public class Smartphone extends Product {
     public Smartphone(long id, String name, BigDecimal price, int quantity) {
         super(id, name, price, quantity);
         this.color = Color.BLACK;
-        this.batteryCapacity = BatteryCapacity.STANDARD;
+        this.batteryCapacity = BatteryCapacity.SMALL;
         this.accessories = new HashSet<>();
     }
 
@@ -26,5 +26,17 @@ public class Smartphone extends Product {
         this.color = color;
         this.batteryCapacity = batteryCapacity;
         this.accessories = accessories;
+    }
+
+    @Override
+    public BigDecimal getTotalPrice(){
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        totalPrice = totalPrice.add(batteryCapacity.getAdditionalCost());
+        for (Accessory accessory : accessories) {
+            totalPrice = totalPrice.add(accessory.getAdditionalCost());
+        }
+
+        return super.getTotalPrice().add(totalPrice);
     }
 }

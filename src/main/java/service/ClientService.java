@@ -1,6 +1,6 @@
 package service;
 
-import entity.Client;
+import entity.client.Client;
 
 public interface ClientService {
     void addClient(Client client);

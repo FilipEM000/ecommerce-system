@@ -1,8 +1,9 @@
 package cart;
 
-import entity.Cart;
-import entity.Client;
+import entity.client.Client;
 import entity.computer.Computer;
+import entity.smartphone.Smartphone;
+import exception.ClientNotFoundException;
 import exception.NotEnoughQuantityInMagazineException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +34,7 @@ public class CartServiceImplTest {
     CartServiceImpl cartServiceImpl;
 
     @Test
-    void shouldAddProductThrowNotEnoughQuantityInMagazineException(){
+    void shouldAddProductThrowNotEnoughQuantityInMagazineException() {
         when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
         when(productRepository.findById(any()))
@@ -46,7 +47,7 @@ public class CartServiceImplTest {
     }
 
     @Test
-    void shouldAddProductToCart(){
+    void shouldAddProductToCart() {
         when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
         when(productRepository.findById(any()))
@@ -58,32 +59,15 @@ public class CartServiceImplTest {
     }
 
     @Test
-    void shouldCheckoutCorrectly(){
+    void shouldClearCartCorrectly() {
         when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
         when(productRepository.findById(any()))
-                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("199.99"), 2)));
+                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("999.99"), 2)));
 
         cartServiceImpl.addProductToCart(1L, 1L, 2);
-        cartServiceImpl.checkout(1L);
+        cartServiceImpl.clearCart(clientRepository.findById(1L).get().getId());
 
         assertThat(clientRepository.findById(1L).get().getCart().getProducts()).isEmpty();
     }
-
-    @Test
-    void shouldCheckoutThrowNotEnoughQuantityInMagazineException() {
-        when(clientRepository.findById(any()))
-                .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
-        when(productRepository.findById(any()))
-                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("199.99"), 2)));
-
-        cartServiceImpl.addProductToCart(1L, 1L, 2);
-        productRepository.findById(1L).get().setQuantity(1);
-
-        assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
-                .isThrownBy(() -> cartServiceImpl.checkout(1L))
-                .extracting(NotEnoughQuantityInMagazineException::getMessage)
-                .isEqualTo("Nie ma wystarczająco produktu na stanie");
-    }
-
 }

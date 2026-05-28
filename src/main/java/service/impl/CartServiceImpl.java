@@ -1,7 +1,7 @@
 package service.impl;
 
-import entity.Cart;
-import entity.Client;
+import entity.client.Cart;
+import entity.client.Client;
 import entity.Product;
 import exception.ClientNotFoundException;
 import exception.NotEnoughQuantityInMagazineException;
@@ -13,8 +13,8 @@ import service.CartService;
 
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {
-    private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
+    private final ClientRepository clientRepository;
 
     @Override
     public void addProductToCart(Long clientId, Long productId, Integer quantity) {
@@ -31,30 +31,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public Cart getAllProductsInCart(Long clientId) {
-        Client client = findClientOrThrow(clientId);
-
-        return client.getCart();
+        return findClientOrThrow(clientId).getCart();
     }
 
     @Override
-    public void checkout(Long clientId) {
-        Client client = findClientOrThrow(clientId);
-
-        processCart(client.getCart());
-
-        client.getCart().getProducts().clear();
-    }
-
-    private void processCart(Cart cart) {
-        cart.getProducts().forEach((productId, quantityInCart) -> {
-            Product product = findProductOrThrow(productId);
-
-            if (product.getQuantity() < quantityInCart) {
-                throw new NotEnoughQuantityInMagazineException("Nie ma wystarczająco produktu na stanie");
-            }
-
-            product.setQuantity(product.getQuantity() - quantityInCart);
-        });
+    public void clearCart(Long clientId) {
+        Cart cart = getAllProductsInCart(clientId);
+        cart.getProducts().clear();
     }
 
     private Client findClientOrThrow(Long clientId) {

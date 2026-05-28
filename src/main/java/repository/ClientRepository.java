@@ -1,6 +1,6 @@
 package repository;
 
-import entity.Client;
+import entity.client.Client;
 
 import java.util.Collections;
 import java.util.HashMap;
