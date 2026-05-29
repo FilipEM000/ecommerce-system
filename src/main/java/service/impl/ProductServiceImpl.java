@@ -1,23 +1,26 @@
 package service.impl;
 
+import dto.ProductDto;
 import entity.Product;
 import exception.InvalidPriceException;
 import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
+import mapper.ProductMapper;
 import repository.ProductRepository;
 import service.ProductService;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override
-    public void addProduct(Product product) {
-        productRepository.save(product);
+    public ProductDto addProduct(Product product) {
+        Product savedProduct = productRepository.save(product);
+        return ProductMapper.mapToDto(savedProduct);
     }
 
     @Override
@@ -57,7 +60,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Map<Long, Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductDto> getAllProducts() {
+        return productRepository.findAll().values().stream()
+                .map(ProductMapper::mapToDto)
+                .toList();
     }
 }

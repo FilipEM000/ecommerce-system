@@ -3,6 +3,7 @@ package product;
 import entity.computer.Computer;
 import entity.Product;
 import exception.InvalidPriceException;
+import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -114,9 +115,20 @@ public class ProductServiceImplTest {
 
     @Test
     void shouldUpdateProductQuantityThrowProductNotFoundException() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductQuantity(1L, 5));
+    }
+
+    @Test
+    void shouldUpdateProductQuantityThrowInvalidQuantityException() {
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("999.99"), 5)));
+
+        assertThatExceptionOfType(InvalidQuantityException.class)
+                .isThrownBy(() -> productServiceImpl.updateProductQuantity(1L, -1))
+                .extracting(InvalidQuantityException::getMessage)
+                .isEqualTo("Dostępna ilość produktu nie może być mniejsza niż 0");
     }
 }
