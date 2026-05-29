@@ -32,4 +32,14 @@ public class Computer extends Product {
 
         return super.getTotalPrice().add(totalPrice);
     }
+
+    @Override
+    public String getDetails() {
+        return "processor: " + processor + ", ram:  " + ram;
+    }
+
+    @Override
+    public String getProductType() {
+        return "Computer";
+    }
 }

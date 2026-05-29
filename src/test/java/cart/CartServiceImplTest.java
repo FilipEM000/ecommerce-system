@@ -2,8 +2,6 @@ package cart;
 
 import entity.client.Client;
 import entity.computer.Computer;
-import entity.smartphone.Smartphone;
-import exception.ClientNotFoundException;
 import exception.NotEnoughQuantityInMagazineException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

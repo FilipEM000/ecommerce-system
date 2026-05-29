@@ -15,7 +15,7 @@ public class Smartphone extends Product {
     private BatteryCapacity batteryCapacity;
     private Set<Accessory> accessories;
 
-    public Smartphone(long id, String name, BigDecimal price, int quantity) {
+    public Smartphone(long id, String name, BigDecimal price, Integer quantity) {
         super(id, name, price, quantity);
         this.color = Color.BLACK;
         this.batteryCapacity = BatteryCapacity.SMALL;
@@ -38,5 +38,15 @@ public class Smartphone extends Product {
         }
 
         return super.getTotalPrice().add(totalPrice);
+    }
+
+    @Override
+    public String getDetails() {
+        return "color: " + color + ",battery capacity: " + batteryCapacity + ",accessories: " + accessories;
+    }
+
+    @Override
+    public String getProductType() {
+        return "Smartphone";
     }
 }

@@ -9,7 +9,17 @@ import java.math.BigDecimal;
 @Getter
 public class Electronics extends Product {
 
-    public Electronics(long id, String name, BigDecimal price, int quantity) {
+    public Electronics(long id, String name, BigDecimal price, Integer quantity) {
         super(id, name, price, quantity);
+    }
+
+    @Override
+    public String getDetails() {
+        return "none";
+    }
+
+    @Override
+    public String getProductType() {
+        return "Electronics";
     }
 }

@@ -1,7 +1,7 @@
 package service;
 
-import entity.Order;
+import dto.OrderDto;
 
 public interface OrderService {
-    Order placeOrder(Long clientId);
+    OrderDto placeOrder(Long clientId);
 }

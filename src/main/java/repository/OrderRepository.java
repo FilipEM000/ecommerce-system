@@ -11,9 +11,10 @@ public class OrderRepository {
     private Map<Long, Order> orders = new HashMap<>();
     private Long orderCounter = 0L;
 
-    public void save(Order order) {
+    public Order save(Order order) {
         order.setId(getNextId());
         orders.putIfAbsent(order.getId(), order);
+        return order;
     }
 
     public void remove(Order order) {

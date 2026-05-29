@@ -1,12 +1,13 @@
 package service;
 
+import dto.ProductDto;
 import entity.Product;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 public interface ProductService {
-    void addProduct(Product product);
+    ProductDto addProduct(Product product);
 
     void deleteProduct(Long productId);
 
@@ -14,5 +15,5 @@ public interface ProductService {
 
     void updateProductQuantity(Long productId, int newQuantity);
 
-    Map<Long, Product> getAllProducts();
+    List<ProductDto> getAllProducts();
 }

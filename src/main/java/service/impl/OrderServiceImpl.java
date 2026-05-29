@@ -1,5 +1,6 @@
 package service.impl;
 
+import dto.OrderDto;
 import entity.Order;
 import entity.Product;
 import entity.client.Cart;
@@ -8,9 +9,12 @@ import exception.ClientNotFoundException;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
+import mapper.OrderMapper;
 import repository.ClientRepository;
 import repository.OrderRepository;
 import repository.ProductRepository;
+import service.CartService;
+import service.InvoiceGenerator;
 import service.OrderService;
 
 import java.math.BigDecimal;
@@ -22,22 +26,25 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
-    private final CartServiceImpl cartService;
+    private final CartService cartService;
+    private final InvoiceGenerator invoiceGenerator;
 
     @Override
-    public Order placeOrder(Long clientId) {
+    public OrderDto placeOrder(Long clientId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta o id " + clientId));
         Cart cart = client.getCart();
 
         BigDecimal cartCost = getTotalCartCost(cart);
         Map<Long, Integer> products = new HashMap<>(cart.getProducts());
+
         processCart(cart);
         cartService.clearCart(clientId);
 
         Order order = new Order(client, products, cartCost);
-        orderRepository.save(order);
-        return order;
+        Order savedOrder = orderRepository.save(order);
+        invoiceGenerator.generateInvoice(savedOrder);
+        return OrderMapper.mapToDto(savedOrder);
     }
 
     private void processCart(Cart cart) {

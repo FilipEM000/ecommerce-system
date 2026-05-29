@@ -1,8 +1,10 @@
 package service.impl;
 
+import dto.ClientDto;
 import entity.client.Client;
 import exception.ClientNotFoundException;
 import lombok.AllArgsConstructor;
+import mapper.ClientMapper;
 import repository.ClientRepository;
 import service.ClientService;
 
@@ -11,8 +13,9 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
 
     @Override
-    public void addClient(Client client) {
-        clientRepository.save(client);
+    public ClientDto addClient(Client client) {
+        Client savedClient = clientRepository.save(client);
+        return ClientMapper.mapToDto(savedClient);
     }
 
     @Override

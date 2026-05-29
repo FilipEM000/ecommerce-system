@@ -10,8 +10,9 @@ import java.util.Optional;
 public final class ProductRepository {
     private Map<Long, Product> products = new HashMap<>();
 
-    public void save(Product product) {
+    public Product save(Product product) {
         products.putIfAbsent(product.getId(), product);
+        return product;
     }
 
     public void remove(Product product) {

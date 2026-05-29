@@ -11,9 +11,10 @@ public class ClientRepository {
     private Map<Long, Client> clients = new HashMap<>();
     private Long clientCounter = 0L;
 
-    public void save(Client client){
+    public Client save(Client client){
         client.setId(getNextId());
         clients.putIfAbsent(client.getId(), client);
+        return client;
     }
 
     public void remove(Client client){
