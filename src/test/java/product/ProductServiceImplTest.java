@@ -1,7 +1,7 @@
 package product;
 
-import entity.computer.Computer;
-import entity.Product;
+import product.entity.computer.Computer;
+import product.entity.Product;
 import exception.InvalidPriceException;
 import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
@@ -14,8 +14,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import repository.ProductRepository;
-import service.impl.ProductServiceImpl;
+import product.repository.impl.InMemoryProductRepository;
+import product.service.impl.ProductServiceImpl;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -30,34 +30,35 @@ import static org.mockito.Mockito.*;
 public class ProductServiceImplTest {
 
     @Mock
-    ProductRepository productRepository;
+    InMemoryProductRepository inMemoryProductRepository;
 
     @InjectMocks
     ProductServiceImpl productServiceImpl;
 
     @Test
     void shouldAddProduct() {
-        Computer computer = new Computer(1L, "asus", new BigDecimal("999"), 10);
+        Computer computer = new Computer("asus", new BigDecimal("999"), 10);
+        when(inMemoryProductRepository.save(any())).thenReturn(computer);
 
         productServiceImpl.addProduct(computer);
 
-        verify(productRepository).save(computer);
+        verify(inMemoryProductRepository).save(computer);
     }
 
     @Test
     void shouldDeleteProduct() {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(
-                new Computer(1L, "asus", new BigDecimal("999"), 10)));
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.of(
+                new Computer("asus", new BigDecimal("999"), 10)));
 
         productServiceImpl.deleteProduct(1L);
         ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
 
-        verify(productRepository).remove(productCaptor.capture());
+        verify(inMemoryProductRepository).remove(productCaptor.capture());
     }
 
     @Test
     void shouldDeleteProductPriceThrowException() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productServiceImpl.deleteProduct(1L));
@@ -65,19 +66,19 @@ public class ProductServiceImplTest {
 
     @Test
     void shouldUpdateProductPrice() {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(
-                new Computer(1L, "name", new BigDecimal("199.99"), 10)));
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.of(
+                new Computer("name", new BigDecimal("199.99"), 10)));
 
-        var expectedResult = new Computer(1L, "name", new BigDecimal("20"), 10);
+        var expectedResult = new Computer("name", new BigDecimal("20"), 10);
         productServiceImpl.updateProductPrice(1L, new BigDecimal("20"));
 
-        var result = productRepository.findById(1L).get();
+        var result = inMemoryProductRepository.findById(1L).get();
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void shouldUpdateProductPriceThrowProductNotFoundException() {
-        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductPrice(1L, new BigDecimal("20")));
@@ -86,8 +87,8 @@ public class ProductServiceImplTest {
     @ParameterizedTest
     @MethodSource("testData")
     void shouldUpdateProductPriceThrowInvalidPriceException(BigDecimal price) {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(
-                new Computer(1L, "name", new BigDecimal("199.99"), 10)));
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.of(
+                new Computer("name", new BigDecimal("199.99"), 10)));
 
         assertThatExceptionOfType(InvalidPriceException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductPrice(1L, price));
@@ -103,19 +104,19 @@ public class ProductServiceImplTest {
 
     @Test
     void shouldUpdateProductQuantity() {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(
-                new Computer(1L, "name", new BigDecimal("199.99"), 10)));
+        when(inMemoryProductRepository.findById(1L)).thenReturn(Optional.of(
+                new Computer("name", new BigDecimal("199.99"), 10)));
 
-        var expectedResult = new Computer(1L, "name", new BigDecimal("199.99"), 15);
+        var expectedResult = new Computer("name", new BigDecimal("199.99"), 15);
         productServiceImpl.updateProductQuantity(1L, 15);
 
-        var result = productRepository.findById(1L).get();
+        var result = inMemoryProductRepository.findById(1L).get();
         assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
     void shouldUpdateProductQuantityThrowProductNotFoundException() {
-        when(productRepository.findById(any())).thenReturn(Optional.empty());
+        when(inMemoryProductRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductQuantity(1L, 5));
@@ -123,8 +124,8 @@ public class ProductServiceImplTest {
 
     @Test
     void shouldUpdateProductQuantityThrowInvalidQuantityException() {
-        when(productRepository.findById(any()))
-                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("999.99"), 5)));
+        when(inMemoryProductRepository.findById(any()))
+                .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("999.99"), 5)));
 
         assertThatExceptionOfType(InvalidQuantityException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductQuantity(1L, -1))

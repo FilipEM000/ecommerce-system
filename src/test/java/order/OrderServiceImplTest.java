@@ -1,10 +1,10 @@
 package order;
 
-import dto.OrderDto;
-import entity.Order;
-import entity.client.Client;
-import entity.computer.Computer;
-import entity.smartphone.Smartphone;
+import order.dto.OrderDto;
+import order.entity.Order;
+import client.entity.Client;
+import product.entity.computer.Computer;
+import product.entity.smartphone.Smartphone;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -12,12 +12,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import repository.ClientRepository;
-import repository.OrderRepository;
-import repository.ProductRepository;
-import service.InvoiceGenerator;
-import service.impl.CartServiceImpl;
-import service.impl.OrderServiceImpl;
+import client.repository.impl.InMemoryClientRepository;
+import order.repository.impl.InMemoryOrderRepository;
+import product.repository.impl.InMemoryProductRepository;
+import order.service.InvoiceGenerator;
+import client.service.impl.CartServiceImpl;
+import order.service.impl.OrderServiceImpl;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -31,13 +31,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceImplTest {
     @Mock
-    OrderRepository orderRepository;
+    InMemoryOrderRepository inMemoryOrderRepository;
 
     @Mock
-    ClientRepository clientRepository;
+    InMemoryClientRepository inMemoryClientRepository;
 
     @Mock
-    ProductRepository productRepository;
+    InMemoryProductRepository inMemoryProductRepository;
 
     @Mock
     CartServiceImpl cartService;
@@ -51,15 +51,19 @@ public class OrderServiceImplTest {
     @Test
     void shouldPlaceOrder() {
         Client client = new Client("Filip", "filip.ostrowicki@wp.pl");
-        when(clientRepository.findById(any())).thenReturn(Optional.of(client));
-        client.getCart().getProducts().put(1L, 2);
-        client.getCart().getProducts().put(2L, 2);
-        when(productRepository.findById(1L))
-                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("999.99"), 2)));
-        when(productRepository.findById(2L))
-                .thenReturn(Optional.of(new Smartphone(2L, "iPhone", new BigDecimal("1999.99"), 2)));
-        when(orderRepository.save(any()))
-                .thenReturn(new Order(client, Map.of(1L, 2, 2L, 2), new BigDecimal("5999.96")));
+        Computer computer = new Computer("ASUS", new BigDecimal("999.99"), 2);
+        computer.setId(1L);
+        Smartphone smartphone = new Smartphone("iPhone", new BigDecimal("1999.99"), 2);
+        smartphone.setId(2L);
+        when(inMemoryClientRepository.findById(any())).thenReturn(Optional.of(client));
+        client.getCart().getProducts().put(computer, 2);
+        client.getCart().getProducts().put(smartphone, 2);
+        when(inMemoryProductRepository.findById(1L))
+                .thenReturn(Optional.of(computer));
+        when(inMemoryProductRepository.findById(2L))
+                .thenReturn(Optional.of(smartphone));
+        when(inMemoryOrderRepository.save(any()))
+                .thenReturn(new Order(client, Map.of(computer, 2, smartphone, 2), new BigDecimal("5999.96")));
 
         var result = orderService.placeOrder(1L);
 
@@ -67,7 +71,7 @@ public class OrderServiceImplTest {
                 .usingRecursiveComparison()
                 .ignoringFields("id")
                 .isEqualTo(
-                        new OrderDto(clientRepository.findById(1L).get().getId(),
+                        new OrderDto(inMemoryClientRepository.findById(1L).get().getId(),
                                 "Filip",
                                 new BigDecimal("5999.96")));
     }
@@ -75,9 +79,12 @@ public class OrderServiceImplTest {
     @Test
     void shouldPlaceOrderThrowProductNotFoundException() {
         Client client = new Client("Filip", "filip.ostrowicki@wp.pl");
-        client.getCart().getProducts().put(1L, 2);
-        when(clientRepository.findById(any())).thenReturn(Optional.of(client));
-        when(productRepository.findById(1L))
+        Computer computer = new Computer("ASUS", new BigDecimal("999.99"), 2);
+        computer.setId(1L);
+        client.getCart().getProducts().put(computer, 2);
+
+        when(inMemoryClientRepository.findById(any())).thenReturn(Optional.of(client));
+        when(inMemoryProductRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
@@ -89,10 +96,13 @@ public class OrderServiceImplTest {
     @Test
     void shouldPlaceOrderThrowNotEnoughQuantityInMagazineException() {
         Client client = new Client("Filip", "filip.ostrowicki@wp.pl");
-        client.getCart().getProducts().put(1L, 3);
-        when(clientRepository.findById(any())).thenReturn(Optional.of(client));
-        when(productRepository.findById(1L))
-                .thenReturn(Optional.of(new Computer(1L, "ASUS", new BigDecimal("999.99"), 2)));
+        Computer computer = new Computer("ASUS", new BigDecimal("999.99"), 2);
+        computer.setId(1L);
+        client.getCart().getProducts().put(computer, 3);
+
+        when(inMemoryClientRepository.findById(any())).thenReturn(Optional.of(client));
+        when(inMemoryProductRepository.findById(1L))
+                .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("999.99"), 2)));
 
         assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
                 .isThrownBy(() -> orderService.placeOrder(1L))
