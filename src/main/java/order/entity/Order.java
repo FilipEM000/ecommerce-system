@@ -7,6 +7,7 @@ import lombok.Setter;
 import product.entity.Product;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
@@ -17,10 +18,12 @@ public class Order {
     private Client client;
     private Map<Product, Integer> products;
     private BigDecimal cost;
+    private LocalDateTime orderDate;
 
     public Order(Client client, Map<Product, Integer> products, BigDecimal cost) {
         this.client = client;
         this.products = products;
         this.cost = cost;
+        this.orderDate = LocalDateTime.now();
     }
 }

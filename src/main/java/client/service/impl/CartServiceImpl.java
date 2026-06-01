@@ -4,10 +4,7 @@ import client.entity.Cart;
 import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
-import exception.ClientNotFoundException;
-import exception.InvalidProductTypeException;
-import exception.NotEnoughQuantityInMagazineException;
-import exception.ProductNotFoundException;
+import exception.*;
 import lombok.AllArgsConstructor;
 import product.entity.Product;
 import product.entity.computer.Computer;
@@ -94,6 +91,10 @@ public class CartServiceImpl implements CartService {
                 .filter(entry -> entry.getKey().getId().equals(masterProduct.getId()))
                 .mapToInt(Map.Entry::getValue)
                 .sum();
+
+        if (quantityToAdd <= 0) {
+            throw new InvalidQuantityException("Ilość dodawana do koszyka musi być większa niż zero!");
+        }
 
         if (masterProduct.getQuantity() < (quantityToAdd + alreadyInCart)) {
             throw new NotEnoughQuantityInMagazineException(

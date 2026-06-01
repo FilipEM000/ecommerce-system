@@ -5,6 +5,7 @@ import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
 import exception.ClientNotFoundException;
+import exception.EmptyCartException;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,10 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta o id " + clientId));
         Cart cart = client.getCart();
 
+        if (cart.getProducts().isEmpty()) {
+            throw new EmptyCartException("Nie można złożyć zamówienia, koszyk jest pusty");
+        }
+
         BigDecimal cartCost = getTotalCartCost(cart);
         Map<Product, Integer> products = new HashMap<>(cart.getProducts());
 
@@ -45,8 +50,8 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order(client, products, cartCost);
         Order savedOrder = orderRepository.save(order);
         Invoice invoice = invoiceGenerator.generateInvoice(savedOrder);
-        invoiceGenerator.printInvoice(invoice);
-        return OrderMapper.mapToDto(savedOrder);
+
+        return OrderMapper.mapToDto(savedOrder, invoice.invoiceNumber());
     }
 
     private void processCart(Cart cart) {

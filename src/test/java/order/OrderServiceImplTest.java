@@ -20,6 +20,7 @@ import client.service.impl.CartServiceImpl;
 import order.service.impl.OrderServiceImpl;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -69,11 +70,12 @@ public class OrderServiceImplTest {
 
         assertThat(result)
                 .usingRecursiveComparison()
-                .ignoringFields("id")
+                .ignoringFields("id", "orderDate")
                 .isEqualTo(
                         new OrderDto(inMemoryClientRepository.findById(1L).get().getId(),
                                 "Filip",
-                                new BigDecimal("5999.96")));
+                                new BigDecimal("5999.96"),
+                                LocalDateTime.now()));
     }
 
     @Test

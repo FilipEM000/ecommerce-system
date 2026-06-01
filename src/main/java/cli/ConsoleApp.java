@@ -4,6 +4,8 @@ import client.dto.ClientDto;
 import client.service.CartService;
 import client.service.ClientService;
 import order.dto.OrderDto;
+import order.entity.Invoice;
+import order.entity.Order;
 import order.service.InvoiceGenerator;
 import order.service.OrderService;
 import product.dto.ProductDto;
@@ -18,10 +20,9 @@ import exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
 import product.service.ProductService;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @RequiredArgsConstructor
 public final class ConsoleApp {
@@ -35,78 +36,29 @@ public final class ConsoleApp {
     private Long currentClientId;
 
     public void run() {
-        int option;
+        int option = -1;
         do {
-            System.out.println("1 - zaloguj się\n2 - stwórz nowe konto\n0 - wyjdź z programu");
-            option = scanner.nextInt();
-            scanner.nextLine();
-            switch (option) {
-                case 1 -> {
-                    System.out.println("LOGOWANIE\nPodaj swój adres email");
-                    String email = scanner.nextLine();
-                    try {
-                        currentClientId = clientService.login(email);
-                    } catch (ClientNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
+            try {
+                System.out.println("1 - zaloguj się\n2 - stwórz nowe konto\n0 - wyjdź z programu");
+                option = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (option) {
+                    case 1 -> handleLogin();
+                    case 2 -> handleRegister();
+                    case 0 -> System.out.println("Do zobaczenia!");
+                    default -> System.out.println("Nieznana opcja.");
                 }
-                case 2 -> {
-                    System.out.println("REJESTRACJA\nPodaj swój adres email");
-                    String email = scanner.nextLine();
-                    System.out.println("Podaj swoje imię");
-                    String name = scanner.nextLine();
-                    ClientDto client = clientService.register(email, name);
-                    currentClientId = client.id();
-                    System.out.println("Witaj " + client.name() + ". Twoje konto zostało utworzone.");
+
+                if (currentClientId != null) {
+                    shopMenuLoop();
                 }
-                case 0 -> System.out.println("Do zobaczenia!");
 
-            }
-
-            if (currentClientId != null) {
-                int shopOption;
-                do {
-                    printMenu();
-                    shopOption = scanner.nextInt();
-                    scanner.nextLine();
-                    switch (shopOption) {
-                        case 1 -> productsMenu();
-                        case 2 -> {
-                            System.out.println("Podaj id produktu, który chcesz dodać do koszyka");
-                            Long productId = scanner.nextLong();
-                            scanner.nextLine();
-
-                            try {
-                                ProductDto product = productService.getProductById(productId);
-
-                                System.out.println("Podaj ilość, którą chcesz dodać:");
-                                int quantity = scanner.nextInt();
-                                scanner.nextLine();
-
-                                switch (product.type()) {
-                                    case "Computer" -> addComputerToCart(product.id(), quantity);
-                                    case "Smartphone" -> addSmartphoneToCart(product.id(), quantity);
-                                    default -> {
-                                        cartService.addStandardProductToCart(currentClientId, productId, quantity);
-                                        System.out.println("Dodano produkt do koszyka!");
-                                    }
-                                }
-                            } catch (ProductNotFoundException | NotEnoughQuantityInMagazineException |
-                                     IllegalArgumentException e) {
-                                System.out.println(e.getMessage());
-                            }
-                        }
-                        case 3 -> printProductsInCart();
-                        case 4 -> {
-                            try {
-                                OrderDto order = orderService.placeOrder(currentClientId);
-                            } catch (Exception e) {
-                                System.out.println("Błąd składania zamówienia: " + e.getMessage());
-                            }
-                        }
-                        case 0 -> currentClientId = null;
-                    }
-                } while (shopOption != 0);
+            } catch (InputMismatchException e) {
+                System.out.println("Wpisano nieprawidłowy znak");
+                scanner.nextLine();
+            } catch (Exception e) {
+                System.out.println("Wystąpił krytyczny błąd: " + e.getMessage());
             }
         } while (option != 0);
     }
@@ -159,6 +111,94 @@ public final class ConsoleApp {
         }
     }
 
+    private void shopMenuLoop() {
+        int shopOption = -1;
+        do {
+            try {
+                printMenu();
+                shopOption = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (shopOption) {
+                    case 1 -> productsMenu();
+                    case 2 -> handleAddToCart();
+                    case 3 -> printProductsInCart();
+                    case 4 -> handlePlaceOrder();
+                    case 0 -> {
+                        System.out.println("Wylogowano pomyślnie");
+                        currentClientId = null;
+                    }
+                    default -> System.out.println("Nieznana opcja");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Wpisano nieprawidłowy znak");
+                scanner.nextLine();
+            } catch (Exception e) {
+                System.out.println("Wystąpił błąd w sklepie: " + e.getMessage());
+            }
+        } while (shopOption != 0 && currentClientId != null);
+    }
+
+    private void handleLogin() {
+        System.out.println("LOGOWANIE\nPodaj swój adres email");
+        String email = scanner.nextLine();
+        try {
+            currentClientId = clientService.login(email);
+        } catch (exception.ClientNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void handleRegister() {
+        System.out.println("REJESTRACJA\nPodaj swój adres email");
+        String email = scanner.nextLine();
+        System.out.println("Podaj swoje imię");
+        String name = scanner.nextLine();
+        ClientDto client = clientService.register(email, name);
+        currentClientId = client.id();
+        System.out.println("Witaj " + client.name() + ". Twoje konto zostało utworzone.");
+    }
+
+    private void handleAddToCart() {
+        {
+            System.out.println("Podaj id produktu, który chcesz dodać do koszyka");
+            Long productId = scanner.nextLong();
+            scanner.nextLine();
+
+            try {
+                ProductDto product = productService.getProductById(productId);
+
+                System.out.println("Podaj ilość, którą chcesz dodać:");
+                int quantity = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (product.type()) {
+                    case "Computer" -> addComputerToCart(product.id(), quantity);
+                    case "Smartphone" -> addSmartphoneToCart(product.id(), quantity);
+                    default -> {
+                        cartService.addStandardProductToCart(currentClientId, productId, quantity);
+                        System.out.println("Dodano produkt do koszyka!");
+                    }
+                }
+            } catch (ProductNotFoundException | NotEnoughQuantityInMagazineException |
+                     IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void handlePlaceOrder() {
+        try {
+            OrderDto order = orderService.placeOrder(currentClientId);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            String formattedDate = order.orderDate().format(formatter);
+            printInvoice(order, formattedDate);
+        } catch (Exception e) {
+            System.out.println("Błąd składania zamówienia: " + e.getMessage());
+        }
+    }
+
     private void printProductsInCart() {
         Map<Product, Integer> products = cartService.getAllProductsInCart(currentClientId).getProducts();
 
@@ -206,5 +246,16 @@ public final class ConsoleApp {
         String battery = scanner.nextLine().toUpperCase();
         cartService.addSmartphoneToCart(currentClientId, productId, quantity, color, battery);
         System.out.println("Dodano skonfigurowanego smartfona do koszyka!");
+    }
+
+    public void printInvoice(OrderDto order, String formattedDate) {
+        System.out.println("\n========================================");
+        System.out.println("ZAMÓWIENIE ZŁOŻONE POMYŚLNIE!");
+        System.out.println("FAKTURA VAT NR: " + order.invoiceNumber());
+        System.out.println("Data zamówienia: " + formattedDate);
+        System.out.println("Nabywca: " + order.clientName());
+        System.out.println("----------------------------------------");
+        System.out.println("DO ZAPŁATY: " + order.cost() + " PLN");
+        System.out.println("========================================\n");
     }
 }
