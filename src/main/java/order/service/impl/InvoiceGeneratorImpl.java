@@ -18,17 +18,4 @@ public class InvoiceGeneratorImpl implements InvoiceGenerator {
         invoiceRepository.save(invoice);
         return invoice;
     }
-
-    @Override
-    public void printInvoice(Invoice invoice) {
-        System.out.println("========================================");
-        System.out.println("FAKTURA VAT NR: " + invoice.invoiceNumber());
-        System.out.println("Data wystawienia: " + LocalDate.now());
-        System.out.println("Nabywca: " + invoice.order().getClient().getName());
-        System.out.println("----------------------------------------");
-
-        System.out.println("----------------------------------------");
-        System.out.println("DO ZAPŁATY: " + invoice.order().getCost() + " PLN");
-        System.out.println("========================================");
-    }
 }
