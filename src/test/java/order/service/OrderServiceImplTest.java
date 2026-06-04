@@ -1,0 +1,118 @@
+package order.service;
+
+import client.entity.Client;
+import client.repository.ClientRepository;
+import client.service.impl.CartServiceImpl;
+import exception.NotEnoughQuantityInMagazineException;
+import exception.ProductNotFoundException;
+import order.dto.OrderDto;
+import order.entity.Invoice;
+import order.entity.Order;
+import order.repository.OrderRepository;
+import order.service.impl.OrderServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import product.entity.computer.Computer;
+import product.repository.ProductRepository;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class OrderServiceImplTest {
+    @Mock
+    OrderRepository orderRepository;
+
+    @Mock
+    ClientRepository clientRepository;
+
+    @Mock
+    ProductRepository productRepository;
+
+    @Mock
+    CartServiceImpl cartService;
+
+    @Mock
+    InvoiceGenerator invoiceGenerator;
+
+    @InjectMocks
+    OrderServiceImpl orderService;
+
+    private Client client;
+    private Computer computer;
+
+    @BeforeEach
+    void setUp() {
+        client = new Client("Filip", "filip@wp.pl");
+        computer = new Computer("ASUS", new BigDecimal("999.99"), 5);
+        computer.setId(1L);
+    }
+
+    @Test
+    void shouldPlaceOrderAndReturnDto() {
+        client.getCart().getProducts().put(computer, 2);
+        when(clientRepository.findById(any()))
+                .thenReturn(Optional.of(client));
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(computer));
+        when(orderRepository.save(any()))
+                .thenReturn(new Order(client, client.getCart().getProducts(), new BigDecimal("1999.98")));
+        when(invoiceGenerator.generateInvoice(any())).thenReturn(new Invoice("FV/001", any()));
+
+        OrderDto orderDto = orderService.placeOrder(1L);
+
+        assertThat(orderDto.clientName()).isEqualTo("Filip");
+        assertThat(orderDto.cost()).isEqualTo(new BigDecimal("1999.98"));
+    }
+
+    @Test
+    void shouldCLearCartAfterPlacingOrder() {
+        client.getCart().getProducts().put(computer, 1);
+        when(clientRepository.findById(any()))
+                .thenReturn(Optional.of(client));
+        when(productRepository.findById(any()))
+                .thenReturn(Optional.of(computer));
+        when(orderRepository.save(any()))
+                .thenReturn(new Order(client, client.getCart().getProducts(), new BigDecimal("999.99")));
+        when(invoiceGenerator.generateInvoice(any()))
+                .thenReturn(new Invoice("FV/001", any()));
+
+        orderService.placeOrder(1L);
+
+        verify(cartService, times(1)).clearCart(1L);
+    }
+
+    @Test
+    void shouldPlaceOrderThrowProductNotFoundException() {
+        client.getCart().getProducts().put(computer, 2);
+        when(clientRepository.findById(any())).thenReturn(Optional.of(client));
+        when(productRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatExceptionOfType(ProductNotFoundException.class)
+                .isThrownBy(() -> orderService.placeOrder(1L))
+                .extracting(ProductNotFoundException::getMessage)
+                .isEqualTo("Nie znaleziono produktu o id " + 1L);
+    }
+
+    @Test
+    void shouldPlaceOrderThrowNotEnoughQuantityInMagazineException() {
+        client.getCart().getProducts().put(computer, 10);
+        when(clientRepository.findById(any())).thenReturn(Optional.of(client));
+        when(productRepository.findById(1L))
+                .thenReturn(Optional.of(computer));
+
+        assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
+                .isThrownBy(() -> orderService.placeOrder(1L))
+                .extracting(NotEnoughQuantityInMagazineException::getMessage)
+                .isEqualTo("Nie ma wystarczająco produktu na stanie");
+    }
+}

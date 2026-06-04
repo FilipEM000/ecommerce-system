@@ -1,6 +1,9 @@
 package client.service;
 
+import client.dto.AddToCartRequest;
 import client.entity.Cart;
+import product.dto.ComputerConfiguration;
+import product.dto.SmartphoneConfiguration;
 
 public interface CartService {
 
@@ -8,9 +11,9 @@ public interface CartService {
 
     void clearCart(Long clientId);
 
-    void addStandardProductToCart(Long clientId, Long productId, Integer quantity);
+    void addStandardProductToCart(AddToCartRequest request);
 
-    void addComputerToCart(Long clientId, Long productId, Integer quantity, String processor, String ram);
+    void addComputerToCart(AddToCartRequest request, ComputerConfiguration configuration);
 
-    void addSmartphoneToCart(Long clientId, Long productId, Integer quantity, String color, String battery);
+    void addSmartphoneToCart(AddToCartRequest request, SmartphoneConfiguration configuration);
 }

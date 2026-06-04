@@ -1,7 +1,9 @@
-package client;
+package client.service;
 
 import client.dto.ClientDto;
 import client.entity.Client;
+import client.repository.ClientRepository;
+import client.service.impl.ClientServiceImpl;
 import exception.ClientNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,8 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import client.repository.impl.InMemoryClientRepository;
-import client.service.impl.ClientServiceImpl;
 
 import java.util.Optional;
 
@@ -24,14 +24,14 @@ import static org.mockito.Mockito.when;
 public class ClientServiceImplTest {
 
     @Mock
-    InMemoryClientRepository inMemoryClientRepository;
+    ClientRepository clientRepository;
 
     @InjectMocks
     ClientServiceImpl clientServiceImpl;
 
     @Test
     void shouldDeleteClientThrowClientNotFoundException() {
-        when(inMemoryClientRepository.findById(1L))
+        when(clientRepository.findById(1L))
                 .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ClientNotFoundException.class)
@@ -43,13 +43,13 @@ public class ClientServiceImplTest {
     void shouldRegisterNewClient() {
         Client mockedClient = new Client("Filip", "test@wp.pl");
         mockedClient.setId(1L);
-        when(inMemoryClientRepository.save(any()))
+        when(clientRepository.save(any()))
                 .thenReturn(mockedClient);
 
         ClientDto result = clientServiceImpl.register("filip@wp.pl", "Filip");
         ArgumentCaptor<Client> clientCaptor = ArgumentCaptor.forClass(Client.class);
 
-        verify(inMemoryClientRepository).save(clientCaptor.capture());
+        verify(clientRepository).save(clientCaptor.capture());
         assertThat(clientCaptor.getValue().getEmail()).isEqualTo("filip@wp.pl");
         assertThat(clientCaptor.getValue().getName()).isEqualTo("Filip");
         assertThat(result.id()).isEqualTo(1L);
@@ -59,7 +59,7 @@ public class ClientServiceImplTest {
     void shouldLoginSuccessfully() {
         Client client = new Client("Filip", "test@wp.pl");
         client.setId(1L);
-        when(inMemoryClientRepository.findByEmail(any()))
+        when(clientRepository.findByEmail(any()))
                 .thenReturn(Optional.of(client));
 
         assertThat(clientServiceImpl.login("test@wp.pl")).isEqualTo(1L);
@@ -67,7 +67,7 @@ public class ClientServiceImplTest {
 
     @Test
     void shouldLoginThrowClientNotFoundException() {
-        when(inMemoryClientRepository.findByEmail(any()))
+        when(clientRepository.findByEmail(any()))
                 .thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ClientNotFoundException.class)
