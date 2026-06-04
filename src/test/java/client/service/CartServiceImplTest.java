@@ -1,6 +1,9 @@
-package cart;
+package client.service;
 
+import client.dto.AddToCartRequest;
 import client.entity.Client;
+import client.repository.ClientRepository;
+import product.dto.ComputerConfiguration;
 import product.entity.computer.Computer;
 import product.entity.computer.ProcessorType;
 import product.entity.computer.Ram;
@@ -10,8 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import client.repository.impl.InMemoryClientRepository;
-import product.repository.impl.InMemoryProductRepository;
+import product.repository.ProductRepository;
 import client.service.impl.CartServiceImpl;
 
 import java.math.BigDecimal;
@@ -25,37 +27,37 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class CartServiceImplTest {
     @Mock
-    InMemoryClientRepository inMemoryClientRepository;
+    ClientRepository clientRepository;
 
     @Mock
-    InMemoryProductRepository inMemoryProductRepository;
+    ProductRepository productRepository;
 
     @InjectMocks
     CartServiceImpl cartServiceImpl;
 
     @Test
     void shouldAddProductThrowNotEnoughQuantityInMagazineException() {
-        when(inMemoryClientRepository.findById(any()))
+        when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
-        when(inMemoryProductRepository.findById(any()))
+        when(productRepository.findById(any()))
                 .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("199.99"), 2)));
 
         assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
-                .isThrownBy(() -> cartServiceImpl.addStandardProductToCart(1L, 1L, 3))
+                .isThrownBy(() -> cartServiceImpl.addStandardProductToCart(new AddToCartRequest(1L, 1L, 3)))
                 .extracting(NotEnoughQuantityInMagazineException::getMessage)
-                .isEqualTo("Nie ma wystarczająco produktu na stanie");
+                .isEqualTo("Nie masz wystarczającej ilości produktu na stanie. Dostępnych w magazynie: 2, w koszyku masz już: 0, próbujesz dodać: 3");
     }
 
     @Test
     void shouldAddProductToCart() {
-        when(inMemoryClientRepository.findById(any()))
+        when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
-        when(inMemoryProductRepository.findById(any()))
+        when(productRepository.findById(any()))
                 .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("199.99"), 2)));
 
-        cartServiceImpl.addStandardProductToCart(1L, 1L, 2);
+        cartServiceImpl.addStandardProductToCart(new AddToCartRequest(1L, 1L, 2));
 
-        assertThat(inMemoryClientRepository.findById(1L).get().getCart().getProducts())
+        assertThat(clientRepository.findById(1L).get().getCart().getProducts())
                 .containsKey(new Computer("ASUS", new BigDecimal("199.99"), 2));
     }
 
@@ -65,13 +67,16 @@ public class CartServiceImplTest {
         client.setId(1L);
         Computer masterComputer = new Computer("ASUS", new BigDecimal("100"), 5);
         masterComputer.setId(1L);
-        when(inMemoryProductRepository.findById(any()))
+        when(productRepository.findById(any()))
                 .thenReturn(Optional.of(masterComputer));
-        when(inMemoryClientRepository.findById(any()))
+        when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(client));
 
 
-        cartServiceImpl.addComputerToCart(1L, 1L, 2, "AMD_RYZEN_7", "DDR4_16_3200");
+        cartServiceImpl.addComputerToCart(
+                new AddToCartRequest(1L, 1L, 2),
+                new ComputerConfiguration("AMD_RYZEN_7", "DDR4_16_3200")
+        );
         Computer expectedComputer = new Computer("ASUS", new BigDecimal("100"), 5);
         expectedComputer.setId(1L);
         expectedComputer.configure(ProcessorType.AMD_RYZEN_7, Ram.DDR4_16_3200);
@@ -83,14 +88,14 @@ public class CartServiceImplTest {
 
     @Test
     void shouldClearCartCorrectly() {
-        when(inMemoryClientRepository.findById(any()))
+        when(clientRepository.findById(any()))
                 .thenReturn(Optional.of(new Client("Filip", "filip.ostrowicki@wp.pl")));
-        when(inMemoryProductRepository.findById(any()))
+        when(productRepository.findById(any()))
                 .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("999.99"), 2)));
 
-        cartServiceImpl.addStandardProductToCart(1L, 1L, 2);
-        cartServiceImpl.clearCart(inMemoryClientRepository.findById(1L).get().getId());
+        cartServiceImpl.addStandardProductToCart(new AddToCartRequest(1L, 1L, 2));
+        cartServiceImpl.clearCart(clientRepository.findById(1L).get().getId());
 
-        assertThat(inMemoryClientRepository.findById(1L).get().getCart().getProducts()).isEmpty();
+        assertThat(clientRepository.findById(1L).get().getCart().getProducts()).isEmpty();
     }
 }

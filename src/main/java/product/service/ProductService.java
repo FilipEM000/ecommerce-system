@@ -22,8 +22,4 @@ public interface ProductService {
     List<ProductDto> getProductsByType(String type);
 
     ProductDto getProductById(Long productId);
-
-    void configureComputer(Long productId, String processorName, String ramName);
-
-    void configureSmartphone(Long productId, String colorName, String batteryName);
 }

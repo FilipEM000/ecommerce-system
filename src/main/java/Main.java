@@ -12,6 +12,7 @@ import order.repository.impl.InMemoryOrderRepository;
 import order.service.InvoiceGenerator;
 import order.service.OrderService;
 import order.service.impl.InvoiceGeneratorImpl;
+import order.service.impl.OrderFileWriter;
 import order.service.impl.OrderServiceImpl;
 import product.entity.Electronics;
 import product.entity.Product;
@@ -34,8 +35,9 @@ public class Main {
 
         CartService cartService = new CartServiceImpl(productRepository, clientRepository);
         ClientService clientService = new ClientServiceImpl(clientRepository);
+        OrderFileWriter orderFileWriter = new OrderFileWriter("orders.json");
         InvoiceGenerator invoiceGenerator = new InvoiceGeneratorImpl(invoiceRepository);
-        OrderService orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator);
+        OrderService orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter);
         ProductService productService = new ProductServiceImpl(productRepository);
 
         ConsoleApp consoleApp = new ConsoleApp(cartService, clientService, invoiceGenerator, orderService, productService);

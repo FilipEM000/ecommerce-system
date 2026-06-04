@@ -30,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final CartService cartService;
     private final InvoiceGenerator invoiceGenerator;
+    private final OrderFileWriter orderFileWriter;
 
     @Override
     public OrderDto placeOrder(Long clientId) {
@@ -49,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order(client, products, cartCost);
         Order savedOrder = orderRepository.save(order);
+        orderFileWriter.write(savedOrder);
         Invoice invoice = invoiceGenerator.generateInvoice(savedOrder);
 
         return OrderMapper.mapToDto(savedOrder, invoice.invoiceNumber());

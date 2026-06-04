@@ -1,11 +1,14 @@
 package client.service.impl;
 
+import client.dto.AddToCartRequest;
 import client.entity.Cart;
 import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
 import exception.*;
 import lombok.AllArgsConstructor;
+import product.dto.ComputerConfiguration;
+import product.dto.SmartphoneConfiguration;
 import product.entity.Product;
 import product.entity.computer.Computer;
 import product.entity.computer.ProcessorType;
@@ -35,42 +38,48 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void addStandardProductToCart(Long clientId, Long productId, Integer quantity) {
-        Client client = findClientOrThrow(clientId);
-        Product masterProduct = findProductOrThrow(productId);
-        validateQuantity(client.getCart(), masterProduct, quantity);
+    public void addStandardProductToCart(AddToCartRequest request) {
+        Client client = findClientOrThrow(request.clientId());
+        Product masterProduct = findProductOrThrow(request.productId());
+        validateQuantity(client.getCart(), masterProduct, request.quantity());
         Product clonedProduct = masterProduct.cloneProduct();
 
-        client.getCart().getProducts().merge(clonedProduct, quantity, Integer::sum);
+        client.getCart().getProducts().merge(clonedProduct, request.quantity(), Integer::sum);
     }
 
     @Override
-    public void addComputerToCart(Long clientId, Long productId, Integer quantity, String processor, String ram) {
-        Client client = findClientOrThrow(clientId);
-        Product masterProduct = findProductOrThrow(productId);
-        validateQuantity(client.getCart(), masterProduct, quantity);
+    public void addComputerToCart(AddToCartRequest request, ComputerConfiguration configuration) {
+        Client client = findClientOrThrow(request.clientId());
+        Product masterProduct = findProductOrThrow(request.productId());
+        validateQuantity(client.getCart(), masterProduct, request.quantity());
 
         if (masterProduct instanceof Computer masterComputer) {
             Computer configuredComputer = new Computer(masterComputer);
-            configuredComputer.configure(ProcessorType.valueOf(processor), Ram.valueOf(ram));
+            configuredComputer.configure(
+                    ProcessorType.valueOf(configuration.processor()),
+                    Ram.valueOf(configuration.ram()
+                    ));
 
-            client.getCart().getProducts().merge(configuredComputer, quantity, Integer::sum);
+            client.getCart().getProducts().merge(configuredComputer, request.quantity(), Integer::sum);
         } else {
             throw new InvalidProductTypeException("Produkt nie jest komputerem");
         }
     }
 
     @Override
-    public void addSmartphoneToCart(Long clientId, Long productId, Integer quantity, String color, String battery) {
-        Client client = findClientOrThrow(clientId);
-        Product masterProduct = findProductOrThrow(productId);
-        validateQuantity(client.getCart(), masterProduct, quantity);
+    public void addSmartphoneToCart(AddToCartRequest request, SmartphoneConfiguration configuration) {
+        Client client = findClientOrThrow(request.clientId());
+        Product masterProduct = findProductOrThrow(request.productId());
+        validateQuantity(client.getCart(), masterProduct, request.quantity());
 
         if (masterProduct instanceof Smartphone masterSmartphone) {
             Smartphone configuredSmartphone = new Smartphone(masterSmartphone);
-            configuredSmartphone.configure(Color.valueOf(color), BatteryCapacity.valueOf(battery), new HashSet<>());
+            configuredSmartphone.configure(Color.valueOf(
+                    configuration.color()),
+                    BatteryCapacity.valueOf(configuration.battery()),
+                    new HashSet<>());
 
-            client.getCart().getProducts().merge(configuredSmartphone, quantity, Integer::sum);
+            client.getCart().getProducts().merge(configuredSmartphone, request.quantity(), Integer::sum);
         } else {
             throw new InvalidProductTypeException("Ten produkt nie jest smartfonem!");
         }

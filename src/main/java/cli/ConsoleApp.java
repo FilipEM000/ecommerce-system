@@ -1,26 +1,26 @@
 package cli;
 
+import client.dto.AddToCartRequest;
 import client.dto.ClientDto;
 import client.service.CartService;
 import client.service.ClientService;
+import exception.ClientNotFoundException;
+import exception.NotEnoughQuantityInMagazineException;
+import exception.ProductNotFoundException;
+import lombok.RequiredArgsConstructor;
 import order.dto.OrderDto;
-import order.entity.Invoice;
-import order.entity.Order;
 import order.service.InvoiceGenerator;
 import order.service.OrderService;
+import product.dto.ComputerConfiguration;
 import product.dto.ProductDto;
+import product.dto.SmartphoneConfiguration;
 import product.entity.Product;
 import product.entity.computer.ProcessorType;
 import product.entity.computer.Ram;
 import product.entity.smartphone.BatteryCapacity;
 import product.entity.smartphone.Color;
-import exception.ClientNotFoundException;
-import exception.NotEnoughQuantityInMagazineException;
-import exception.ProductNotFoundException;
-import lombok.RequiredArgsConstructor;
 import product.service.ProductService;
 
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -144,7 +144,7 @@ public final class ConsoleApp {
         String email = scanner.nextLine();
         try {
             currentClientId = clientService.login(email);
-        } catch (exception.ClientNotFoundException e) {
+        } catch (ClientNotFoundException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -160,30 +160,28 @@ public final class ConsoleApp {
     }
 
     private void handleAddToCart() {
-        {
-            System.out.println("Podaj id produktu, który chcesz dodać do koszyka");
-            Long productId = scanner.nextLong();
+        System.out.println("Podaj id produktu, który chcesz dodać do koszyka");
+        Long productId = scanner.nextLong();
+        scanner.nextLine();
+
+        try {
+            ProductDto product = productService.getProductById(productId);
+
+            System.out.println("Podaj ilość, którą chcesz dodać:");
+            int quantity = scanner.nextInt();
             scanner.nextLine();
 
-            try {
-                ProductDto product = productService.getProductById(productId);
-
-                System.out.println("Podaj ilość, którą chcesz dodać:");
-                int quantity = scanner.nextInt();
-                scanner.nextLine();
-
-                switch (product.type()) {
-                    case "Computer" -> addComputerToCart(product.id(), quantity);
-                    case "Smartphone" -> addSmartphoneToCart(product.id(), quantity);
-                    default -> {
-                        cartService.addStandardProductToCart(currentClientId, productId, quantity);
-                        System.out.println("Dodano produkt do koszyka!");
-                    }
+            switch (product.type()) {
+                case "Computer" -> addComputerToCart(product.id(), quantity);
+                case "Smartphone" -> addSmartphoneToCart(product.id(), quantity);
+                default -> {
+                    cartService.addStandardProductToCart(new AddToCartRequest(currentClientId, productId, quantity));
+                    System.out.println("Dodano produkt do koszyka!");
                 }
-            } catch (ProductNotFoundException | NotEnoughQuantityInMagazineException |
-                     IllegalArgumentException e) {
-                System.out.println(e.getMessage());
             }
+        } catch (ProductNotFoundException | NotEnoughQuantityInMagazineException |
+                 IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
@@ -228,7 +226,8 @@ public final class ConsoleApp {
                 .forEach(ram -> System.out.println(ram.name()));
         System.out.print("Wpisz RAM: ");
         String ram = scanner.nextLine().toUpperCase();
-        cartService.addComputerToCart(currentClientId, productId, quantity, processor, ram);
+        cartService.addComputerToCart(
+                new AddToCartRequest(currentClientId, productId, quantity), new ComputerConfiguration(processor, ram));
         System.out.println("Dodano skonfigurowany komputer do koszyka!");
     }
 
@@ -244,7 +243,8 @@ public final class ConsoleApp {
                 .forEach(batteryCapacity -> System.out.println(batteryCapacity.name()));
         System.out.print("Wpisz baterię: ");
         String battery = scanner.nextLine().toUpperCase();
-        cartService.addSmartphoneToCart(currentClientId, productId, quantity, color, battery);
+        cartService.addSmartphoneToCart(
+                new AddToCartRequest(currentClientId, productId, quantity), new SmartphoneConfiguration(color, battery));
         System.out.println("Dodano skonfigurowanego smartfona do koszyka!");
     }
 

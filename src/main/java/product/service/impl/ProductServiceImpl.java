@@ -89,14 +89,4 @@ public class ProductServiceImpl implements ProductService {
 
         return ProductMapper.mapToDto(product);
     }
-
-    @Override
-    public void configureComputer(Long productId, String processorName, String ramName) {
-
-    }
-
-    @Override
-    public void configureSmartphone(Long productId, String colorName, String batteryName) {
-
-    }
 }
