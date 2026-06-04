@@ -22,7 +22,7 @@ public class OrderFileWriter {
         this.fileName = fileName;
     }
 
-    public void write(Order order) {
+    public synchronized void write(Order order) {
         List<OrderItemEntry> items = order.getProducts().entrySet().stream()
                 .map(entry -> new OrderItemEntry(
                         entry.getKey().getName(),
@@ -37,7 +37,6 @@ public class OrderFileWriter {
                 order.getCost(),
                 order.getOrderDate(),
                 items));
-
         try {
             objectMapper.writerWithDefaultPrettyPrinter()
                     .writeValue(new File(fileName), orders);
