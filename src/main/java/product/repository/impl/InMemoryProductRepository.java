@@ -4,13 +4,14 @@ import product.entity.Product;
 import product.repository.ProductRepository;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryProductRepository implements ProductRepository {
-    private Map<Long, Product> products = new HashMap<>();
-    private Long productCounter = 0L;
+    private Map<Long, Product> products = new ConcurrentHashMap<>();
+    private AtomicLong productCounter = new AtomicLong(0);
 
     public Product save(Product product) {
         if (product.getId() == null) {
@@ -32,7 +33,7 @@ public final class InMemoryProductRepository implements ProductRepository {
         return Collections.unmodifiableMap(products);
     }
 
-    public Long getNextId(){
-        return productCounter++;
+    public Long getNextId() {
+        return productCounter.getAndIncrement();
     }
 }

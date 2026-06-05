@@ -4,13 +4,14 @@ import order.entity.Order;
 import order.repository.OrderRepository;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryOrderRepository implements OrderRepository {
-    private Map<Long, Order> orders = new HashMap<>();
-    private Long orderCounter = 0L;
+    private Map<Long, Order> orders = new ConcurrentHashMap<>();
+    private AtomicLong orderCounter = new AtomicLong(0);
 
     public Order save(Order order) {
         if (order.getId() == null) {
@@ -32,7 +33,7 @@ public final class InMemoryOrderRepository implements OrderRepository {
         return Collections.unmodifiableMap(orders);
     }
 
-    public Long getNextId(){
-        return orderCounter++;
+    public Long getNextId() {
+        return orderCounter.getAndIncrement();
     }
 }

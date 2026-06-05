@@ -3,12 +3,12 @@ package order.repository.impl;
 import order.entity.Invoice;
 import order.repository.InvoiceRepository;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class InMemoryInvoiceRepository implements InvoiceRepository {
-    private Map<String, Invoice> invoices = new HashMap<>();
+    private Map<String, Invoice> invoices = new ConcurrentHashMap<>();
 
     public Invoice save(Invoice invoice) {
         invoices.put(invoice.invoiceNumber(), invoice);

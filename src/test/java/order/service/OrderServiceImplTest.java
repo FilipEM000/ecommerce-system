@@ -9,6 +9,7 @@ import order.dto.OrderDto;
 import order.entity.Invoice;
 import order.entity.Order;
 import order.repository.OrderRepository;
+import order.service.impl.OrderFileWriter;
 import order.service.impl.OrderServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ public class OrderServiceImplTest {
 
     @Mock
     InvoiceGenerator invoiceGenerator;
+
+    @Mock
+    OrderFileWriter orderFileWriter;
 
     @InjectMocks
     OrderServiceImpl orderService;

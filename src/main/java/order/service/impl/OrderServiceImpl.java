@@ -60,11 +60,13 @@ public class OrderServiceImpl implements OrderService {
         cart.getProducts().forEach((configuredProduct, quantityInCart) -> {
             Product masterProduct = findProductOrThrow(configuredProduct.getId());
 
-            if (masterProduct.getQuantity() < quantityInCart) {
-                throw new NotEnoughQuantityInMagazineException("Nie ma wystarczająco produktu na stanie");
-            }
+            synchronized (masterProduct) {
+                if (masterProduct.getQuantity() < quantityInCart) {
+                    throw new NotEnoughQuantityInMagazineException("Nie ma wystarczająco produktu na stanie");
+                }
 
-            masterProduct.setQuantity(masterProduct.getQuantity() - quantityInCart);
+                masterProduct.setQuantity(masterProduct.getQuantity() - quantityInCart);
+            }
         });
     }
 
