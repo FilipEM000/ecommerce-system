@@ -1,10 +1,15 @@
-import cli.ConsoleApp;
+import cli.*;
 import client.repository.ClientRepository;
 import client.repository.impl.InMemoryClientRepository;
 import client.service.CartService;
 import client.service.ClientService;
 import client.service.impl.CartServiceImpl;
 import client.service.impl.ClientServiceImpl;
+import discount.PercentageDiscountPolicy;
+import discount.ThresholdDiscountPolicy;
+import discount.repository.DiscountRepository;
+import discount.repository.impl.InMemoryDiscountRepository;
+import discount.service.DiscountService;
 import order.repository.InvoiceRepository;
 import order.repository.OrderRepository;
 import order.repository.impl.InMemoryInvoiceRepository;
@@ -25,6 +30,7 @@ import product.service.impl.ProductServiceImpl;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -32,15 +38,26 @@ public class Main {
         InvoiceRepository invoiceRepository = new InMemoryInvoiceRepository();
         OrderRepository orderRepository = new InMemoryOrderRepository();
         ProductRepository productRepository = new InMemoryProductRepository();
+        DiscountRepository discountRepository = new InMemoryDiscountRepository();
 
+        DiscountService discountService = new DiscountService(discountRepository);
         CartService cartService = new CartServiceImpl(productRepository, clientRepository);
         ClientService clientService = new ClientServiceImpl(clientRepository);
         OrderFileWriter orderFileWriter = new OrderFileWriter("orders.json");
         InvoiceGenerator invoiceGenerator = new InvoiceGeneratorImpl(invoiceRepository);
-        OrderService orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter);
+        OrderService orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService);
         ProductService productService = new ProductServiceImpl(productRepository);
 
-        ConsoleApp consoleApp = new ConsoleApp(cartService, clientService, invoiceGenerator, orderService, productService);
+        Scanner scanner = new Scanner(System.in);
+        AuthHandler authHandler = new AuthHandler(clientService, scanner);
+        ProductHandler productHandler = new ProductHandler(productService, scanner);
+        CartHandler cartHandler = new CartHandler(cartService, productService, scanner);
+        OrderHandler orderHandler = new OrderHandler(orderService, scanner);
+
+        ConsoleApp consoleApp = new ConsoleApp(authHandler, productHandler, cartHandler, orderHandler, scanner);
+
+        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(0.10));
+        discountService.addNewPromoCode("BOGACZ200", new ThresholdDiscountPolicy(new BigDecimal("5000"), new BigDecimal("200")));
 
         List<Product> products = List.of(
                 new Computer("Dell Inspiron 15", new BigDecimal("2999.99"), 10),

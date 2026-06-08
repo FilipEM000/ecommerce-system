@@ -3,6 +3,7 @@ package order.service;
 import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.impl.CartServiceImpl;
+import discount.service.DiscountService;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import order.dto.OrderDto;
@@ -48,6 +49,9 @@ public class OrderServiceImplTest {
     @Mock
     OrderFileWriter orderFileWriter;
 
+    @Mock
+    DiscountService discountService;
+
     @InjectMocks
     OrderServiceImpl orderService;
 
@@ -59,6 +63,9 @@ public class OrderServiceImplTest {
         client = new Client("Filip", "filip@wp.pl");
         computer = new Computer("ASUS", new BigDecimal("999.99"), 5);
         computer.setId(1L);
+
+        when(discountService.getPolicyForCode(any()))
+                .thenReturn(totalCost -> BigDecimal.ZERO);
     }
 
     @Test
@@ -72,7 +79,7 @@ public class OrderServiceImplTest {
                 .thenReturn(new Order(client, client.getCart().getProducts(), new BigDecimal("1999.98")));
         when(invoiceGenerator.generateInvoice(any())).thenReturn(new Invoice("FV/001", any()));
 
-        OrderDto orderDto = orderService.placeOrder(1L);
+        OrderDto orderDto = orderService.placeOrder(1L, null);
 
         assertThat(orderDto.clientName()).isEqualTo("Filip");
         assertThat(orderDto.cost()).isEqualTo(new BigDecimal("1999.98"));
@@ -90,7 +97,7 @@ public class OrderServiceImplTest {
         when(invoiceGenerator.generateInvoice(any()))
                 .thenReturn(new Invoice("FV/001", any()));
 
-        orderService.placeOrder(1L);
+        orderService.placeOrder(1L, null);
 
         verify(cartService, times(1)).clearCart(1L);
     }
@@ -102,7 +109,7 @@ public class OrderServiceImplTest {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(ProductNotFoundException.class)
-                .isThrownBy(() -> orderService.placeOrder(1L))
+                .isThrownBy(() -> orderService.placeOrder(1L, null))
                 .extracting(ProductNotFoundException::getMessage)
                 .isEqualTo("Nie znaleziono produktu o id " + 1L);
     }
@@ -115,7 +122,7 @@ public class OrderServiceImplTest {
                 .thenReturn(Optional.of(computer));
 
         assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
-                .isThrownBy(() -> orderService.placeOrder(1L))
+                .isThrownBy(() -> orderService.placeOrder(1L, null))
                 .extracting(NotEnoughQuantityInMagazineException::getMessage)
                 .isEqualTo("Nie ma wystarczająco produktu na stanie");
     }

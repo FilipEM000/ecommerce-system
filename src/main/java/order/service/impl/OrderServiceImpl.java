@@ -4,6 +4,8 @@ import client.entity.Cart;
 import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
+import discount.DiscountPolicy;
+import discount.service.DiscountService;
 import exception.ClientNotFoundException;
 import exception.EmptyCartException;
 import exception.NotEnoughQuantityInMagazineException;
@@ -31,9 +33,11 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final InvoiceGenerator invoiceGenerator;
     private final OrderFileWriter orderFileWriter;
+    private final DiscountService discountService;
+
 
     @Override
-    public OrderDto placeOrder(Long clientId) {
+    public OrderDto placeOrder(Long clientId, String promoCode) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta o id " + clientId));
         Cart cart = client.getCart();
@@ -43,12 +47,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         BigDecimal cartCost = getTotalCartCost(cart);
-        Map<Product, Integer> products = new HashMap<>(cart.getProducts());
 
+        DiscountPolicy policy = discountService.getPolicyForCode(promoCode);
+        BigDecimal discount = policy.calculateDiscount(cartCost);
+        BigDecimal finalCost = cartCost.subtract(discount);
+
+        Map<Product, Integer> products = new HashMap<>(cart.getProducts());
         processCart(cart);
         cartService.clearCart(clientId);
 
-        Order order = new Order(client, products, cartCost);
+        Order order = new Order(client, products, finalCost);
         Order savedOrder = orderRepository.save(order);
         orderFileWriter.write(savedOrder);
         Invoice invoice = invoiceGenerator.generateInvoice(savedOrder);

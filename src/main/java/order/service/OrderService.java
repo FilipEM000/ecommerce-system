@@ -3,5 +3,5 @@ package order.service;
 import order.dto.OrderDto;
 
 public interface OrderService {
-    OrderDto placeOrder(Long clientId);
+    OrderDto placeOrder(Long clientId, String promoCode);
 }
