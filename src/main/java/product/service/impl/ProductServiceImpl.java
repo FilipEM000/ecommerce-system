@@ -1,7 +1,5 @@
 package product.service.impl;
 
-import exception.InvalidPriceException;
-import exception.InvalidQuantityException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import product.dto.ProductDto;
@@ -9,6 +7,7 @@ import product.entity.Product;
 import product.mapper.ProductMapper;
 import product.repository.ProductRepository;
 import product.service.ProductService;
+import product.validator.ProductValidator;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,30 +32,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void updateProductPrice(Long productId, BigDecimal newPrice) {
+        ProductValidator.validatePrice(newPrice);
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
-
-        if (newPrice == null) {
-            throw new InvalidPriceException("Nie podałeś ceny");
-        }
-
-        if (newPrice.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidPriceException("Cena musi być większa od 0");
-        }
 
         product.setPrice(newPrice);
     }
 
     @Override
     public void updateProductQuantity(Long productId, int newQuantity) {
+        ProductValidator.validateQuantity(newQuantity);
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
 
-        if (newQuantity >= 0) {
-            product.setQuantity(newQuantity);
-        } else {
-            throw new InvalidQuantityException("Dostępna ilość produktu nie może być mniejsza niż 0");
-        }
+        product.setQuantity(newQuantity);
     }
 
     @Override

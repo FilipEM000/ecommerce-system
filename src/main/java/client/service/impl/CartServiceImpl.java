@@ -5,7 +5,11 @@ import client.entity.Cart;
 import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
-import exception.*;
+import client.validator.CartValidator;
+import exception.ClientNotFoundException;
+import exception.InvalidQuantityException;
+import exception.NotEnoughQuantityInMagazineException;
+import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import product.dto.ComputerConfiguration;
 import product.dto.SmartphoneConfiguration;
@@ -41,9 +45,10 @@ public class CartServiceImpl implements CartService {
     public void addStandardProductToCart(AddToCartRequest request) {
         Client client = findClientOrThrow(request.clientId());
         Product masterProduct = findProductOrThrow(request.productId());
-        validateQuantity(client.getCart(), masterProduct, request.quantity());
-        Product clonedProduct = masterProduct.cloneProduct();
 
+        CartValidator.validateQuantityToAdd(client.getCart(), masterProduct, request.quantity());
+
+        Product clonedProduct = masterProduct.cloneProduct();
         client.getCart().getProducts().merge(clonedProduct, request.quantity(), Integer::sum);
     }
 
@@ -51,38 +56,35 @@ public class CartServiceImpl implements CartService {
     public void addComputerToCart(AddToCartRequest request, ComputerConfiguration configuration) {
         Client client = findClientOrThrow(request.clientId());
         Product masterProduct = findProductOrThrow(request.productId());
-        validateQuantity(client.getCart(), masterProduct, request.quantity());
 
-        if (masterProduct instanceof Computer masterComputer) {
-            Computer configuredComputer = new Computer(masterComputer);
-            configuredComputer.configure(
-                    ProcessorType.valueOf(configuration.processor()),
-                    Ram.valueOf(configuration.ram()
-                    ));
+        CartValidator.validateQuantityToAdd(client.getCart(), masterProduct, request.quantity());
+        Computer masterComputer = CartValidator.validateAndCastToComputer(masterProduct);
 
-            client.getCart().getProducts().merge(configuredComputer, request.quantity(), Integer::sum);
-        } else {
-            throw new InvalidProductTypeException("Produkt nie jest komputerem");
-        }
+        Computer configuredComputer = new Computer(masterComputer);
+        configuredComputer.configure(
+                ProcessorType.valueOf(configuration.processor()),
+                Ram.valueOf(configuration.ram()
+                ));
+
+        client.getCart().getProducts().merge(configuredComputer, request.quantity(), Integer::sum);
+
     }
 
     @Override
     public void addSmartphoneToCart(AddToCartRequest request, SmartphoneConfiguration configuration) {
         Client client = findClientOrThrow(request.clientId());
         Product masterProduct = findProductOrThrow(request.productId());
-        validateQuantity(client.getCart(), masterProduct, request.quantity());
 
-        if (masterProduct instanceof Smartphone masterSmartphone) {
-            Smartphone configuredSmartphone = new Smartphone(masterSmartphone);
-            configuredSmartphone.configure(Color.valueOf(
-                    configuration.color()),
-                    BatteryCapacity.valueOf(configuration.battery()),
-                    new HashSet<>());
+        CartValidator.validateQuantityToAdd(client.getCart(), masterProduct, request.quantity());
+        Smartphone masterSmartphone = CartValidator.validateAndCastToSmartphone(masterProduct);
 
-            client.getCart().getProducts().merge(configuredSmartphone, request.quantity(), Integer::sum);
-        } else {
-            throw new InvalidProductTypeException("Ten produkt nie jest smartfonem!");
-        }
+        Smartphone configuredSmartphone = new Smartphone(masterSmartphone);
+        configuredSmartphone.configure(Color.valueOf(
+                        configuration.color()),
+                BatteryCapacity.valueOf(configuration.battery()),
+                new HashSet<>());
+
+        client.getCart().getProducts().merge(configuredSmartphone, request.quantity(), Integer::sum);
     }
 
     private Client findClientOrThrow(Long clientId) {
@@ -93,24 +95,5 @@ public class CartServiceImpl implements CartService {
     private Product findProductOrThrow(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
-    }
-
-    private void validateQuantity(Cart cart, Product masterProduct, Integer quantityToAdd) {
-        int alreadyInCart = cart.getProducts().entrySet().stream()
-                .filter(entry -> entry.getKey().getId().equals(masterProduct.getId()))
-                .mapToInt(Map.Entry::getValue)
-                .sum();
-
-        if (quantityToAdd <= 0) {
-            throw new InvalidQuantityException("Ilość dodawana do koszyka musi być większa niż zero!");
-        }
-
-        if (masterProduct.getQuantity() < (quantityToAdd + alreadyInCart)) {
-            throw new NotEnoughQuantityInMagazineException(
-                    "Nie masz wystarczającej ilości produktu na stanie. Dostępnych w magazynie: "
-                            + masterProduct.getQuantity()
-                            + ", w koszyku masz już: " + alreadyInCart
-                            + ", próbujesz dodać: " + quantityToAdd);
-        }
     }
 }

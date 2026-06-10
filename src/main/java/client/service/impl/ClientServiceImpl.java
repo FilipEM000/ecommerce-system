@@ -5,6 +5,7 @@ import client.entity.Client;
 import client.mapper.ClientMapper;
 import client.repository.ClientRepository;
 import client.service.ClientService;
+import client.validator.ClientValidator;
 import exception.ClientNotFoundException;
 import lombok.AllArgsConstructor;
 
@@ -31,6 +32,8 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDto register(String email, String name) {
+        ClientValidator.validateRegistration(email, name);
+
         Client client = new Client(name, email);
         Client savedClient = clientRepository.save(client);
         return ClientMapper.mapToDto(savedClient);

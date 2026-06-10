@@ -21,6 +21,13 @@ public class OrderFileWriter {
         this.fileName = fileName;
     }
 
+    /**
+     * Writes an order to a JSON file.
+     * This method is synchronized to ensure thread safety, preventing race conditions
+     * and file corruption when multiple clients place orders simultaneously.
+     *
+     * @param order The order entity to be serialized and saved.
+     */
     public synchronized void write(Order order) {
         List<OrderItemEntry> items = order.getProducts().entrySet().stream()
                 .map(entry -> new OrderItemEntry(

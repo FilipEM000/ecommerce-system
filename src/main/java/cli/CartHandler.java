@@ -2,6 +2,8 @@ package cli;
 
 import client.dto.AddToCartRequest;
 import client.service.CartService;
+import exception.InvalidProductTypeException;
+import exception.InvalidQuantityException;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
@@ -45,7 +47,7 @@ public class CartHandler {
                 }
             }
         } catch (ProductNotFoundException | NotEnoughQuantityInMagazineException |
-                 IllegalArgumentException e) {
+                 IllegalArgumentException | InvalidQuantityException | InvalidProductTypeException e) {
             System.out.println(e.getMessage());
         }
     }
@@ -65,6 +67,7 @@ public class CartHandler {
             });
         }
     }
+
     private void addComputerToCart(AddToCartRequest request) {
         System.out.println("--- KONFIGURACJA KOMPUTERA ---");
         System.out.println("Dostępne procesory:");
@@ -81,6 +84,7 @@ public class CartHandler {
         cartService.addComputerToCart(request, new ComputerConfiguration(processor, ram));
         System.out.println("Dodano skonfigurowany komputer do koszyka!");
     }
+
     private void addSmartphoneToCart(AddToCartRequest request) {
         System.out.println("--- KONFIGURACJA SMARTFONA ---");
         System.out.println("Dostępne kolory:");

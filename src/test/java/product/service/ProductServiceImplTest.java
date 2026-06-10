@@ -87,9 +87,6 @@ public class ProductServiceImplTest {
     @ParameterizedTest
     @MethodSource("testData")
     void shouldUpdateProductPriceThrowInvalidPriceException(BigDecimal price) {
-        when(productRepository.findById(1L)).thenReturn(Optional.of(
-                new Computer("name", new BigDecimal("199.99"), 10)));
-
         assertThatExceptionOfType(InvalidPriceException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductPrice(1L, price));
     }
@@ -124,9 +121,6 @@ public class ProductServiceImplTest {
 
     @Test
     void shouldUpdateProductQuantityThrowInvalidQuantityException() {
-        when(productRepository.findById(any()))
-                .thenReturn(Optional.of(new Computer("ASUS", new BigDecimal("999.99"), 5)));
-
         assertThatExceptionOfType(InvalidQuantityException.class)
                 .isThrownBy(() -> productServiceImpl.updateProductQuantity(1L, -1))
                 .extracting(InvalidQuantityException::getMessage)
