@@ -45,7 +45,7 @@ public class Main {
         ClientService clientService = new ClientServiceImpl(clientRepository);
         OrderFileWriter orderFileWriter = new OrderFileWriter("orders.json");
         InvoiceGenerator invoiceGenerator = new InvoiceGeneratorImpl(invoiceRepository);
-        OrderService orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService);
+        OrderServiceImpl orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService);
         ProductService productService = new ProductServiceImpl(productRepository);
 
         Scanner scanner = new Scanner(System.in);
@@ -71,5 +71,6 @@ public class Main {
         products.forEach(productService::addProduct);
 
         consoleApp.run();
+        orderService.shutdown();
     }
 }

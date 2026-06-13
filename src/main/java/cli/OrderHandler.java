@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 @AllArgsConstructor
 public class OrderHandler {
-    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    private final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss z");
 
     private final OrderService orderService;
     private final Scanner scanner;

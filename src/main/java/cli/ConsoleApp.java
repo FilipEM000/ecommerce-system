@@ -66,10 +66,10 @@ public final class ConsoleApp {
                     default -> System.out.println("Nieznana opcja");
                 }
             } catch (InputMismatchException e) {
-                System.out.println("Wpisano nieprawidłowy znak");
+                System.err.println("Wpisano nieprawidłowy znak");
                 scanner.nextLine();
             } catch (Exception e) {
-                System.out.println("Wystąpił błąd w sklepie: " + e.getMessage());
+                System.err.println("Wystąpił błąd w sklepie: " + e.getMessage());
             }
         } while (shopOption != 0 && currentClientId != null);
     }

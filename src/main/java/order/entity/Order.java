@@ -1,14 +1,14 @@
 package order.entity;
 
 import client.entity.Client;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import order.timeConfig.TimeConfig;
 import product.entity.Product;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 @Getter
@@ -19,12 +19,12 @@ public class Order {
     private Client client;
     private Map<Product, Integer> products;
     private BigDecimal cost;
-    private LocalDateTime orderDate;
+    private ZonedDateTime orderDate;
 
     public Order(Client client, Map<Product, Integer> products, BigDecimal cost) {
         this.client = client;
         this.products = products;
         this.cost = cost;
-        this.orderDate = LocalDateTime.now();
+        this.orderDate = ZonedDateTime.now(TimeConfig.APP_ZONE);
     }
 }
