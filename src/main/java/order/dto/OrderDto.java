@@ -1,11 +1,11 @@
 package order.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public record OrderDto(Long id,
                        String clientName,
                        BigDecimal cost,
-                       LocalDateTime orderDate,
+                       ZonedDateTime orderDate,
                        String invoiceNumber) {
 }

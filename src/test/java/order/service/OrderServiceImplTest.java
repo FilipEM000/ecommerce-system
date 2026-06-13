@@ -77,12 +77,12 @@ public class OrderServiceImplTest {
                 .thenReturn(Optional.of(computer));
         when(orderRepository.save(any()))
                 .thenReturn(new Order(client, client.getCart().getProducts(), new BigDecimal("1999.98")));
-        when(invoiceGenerator.generateInvoice(any())).thenReturn(new Invoice("FV/001", any()));
 
         OrderDto orderDto = orderService.placeOrder(1L, null);
 
         assertThat(orderDto.clientName()).isEqualTo("Filip");
         assertThat(orderDto.cost()).isEqualTo(new BigDecimal("1999.98"));
+        assertThat(orderDto.invoiceNumber()).isEqualTo("W TRAKCIE GENEROWANIA");
     }
 
     @Test
@@ -94,8 +94,6 @@ public class OrderServiceImplTest {
                 .thenReturn(Optional.of(computer));
         when(orderRepository.save(any()))
                 .thenReturn(new Order(client, client.getCart().getProducts(), new BigDecimal("999.99")));
-        when(invoiceGenerator.generateInvoice(any()))
-                .thenReturn(new Invoice("FV/001", any()));
 
         orderService.placeOrder(1L, null);
 

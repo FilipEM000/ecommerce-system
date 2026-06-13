@@ -7,8 +7,6 @@ import client.repository.ClientRepository;
 import client.service.CartService;
 import client.validator.CartValidator;
 import exception.ClientNotFoundException;
-import exception.InvalidQuantityException;
-import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
 import lombok.AllArgsConstructor;
 import product.dto.ComputerConfiguration;
@@ -23,7 +21,6 @@ import product.entity.smartphone.Smartphone;
 import product.repository.ProductRepository;
 
 import java.util.HashSet;
-import java.util.Map;
 
 @AllArgsConstructor
 public class CartServiceImpl implements CartService {

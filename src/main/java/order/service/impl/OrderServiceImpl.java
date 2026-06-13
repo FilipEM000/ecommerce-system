@@ -10,9 +10,8 @@ import exception.ClientNotFoundException;
 import exception.EmptyCartException;
 import exception.NotEnoughQuantityInMagazineException;
 import exception.ProductNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import order.dto.OrderDto;
-import order.entity.Invoice;
 import order.entity.Order;
 import order.mapper.OrderMapper;
 import order.repository.OrderRepository;
@@ -24,8 +23,12 @@ import product.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
@@ -34,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final InvoiceGenerator invoiceGenerator;
     private final OrderFileWriter orderFileWriter;
     private final DiscountService discountService;
+    private final ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
 
 
     @Override
@@ -58,10 +62,16 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order(client, products, finalCost);
         Order savedOrder = orderRepository.save(order);
-        orderFileWriter.write(savedOrder);
-        Invoice invoice = invoiceGenerator.generateInvoice(savedOrder);
 
-        return OrderMapper.mapToDto(savedOrder, invoice.invoiceNumber());
+        CompletableFuture.runAsync(() -> {
+            orderFileWriter.write(savedOrder);
+            invoiceGenerator.generateInvoice(savedOrder);
+        }, asyncExecutor).exceptionally(ex -> {
+            System.err.println("Błąd podczas przetwarzania zamówienia: " + ex.getMessage());
+            return null;
+        });
+
+        return OrderMapper.mapToDto(savedOrder, "W TRAKCIE GENEROWANIA");
     }
 
     private void processCart(Cart cart) {
@@ -90,5 +100,18 @@ public class OrderServiceImpl implements OrderService {
     private Product findProductOrThrow(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+    }
+
+    public void shutdown() {
+        asyncExecutor.shutdown();
+        try {
+            if (!asyncExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                System.err.println("Wymuszono zamknięcie puli wątków — nie wszystkie zadania zostały ukończone.");
+                asyncExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            asyncExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 }
