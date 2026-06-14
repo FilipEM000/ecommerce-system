@@ -8,6 +8,8 @@ import exception.NotEnoughQuantityInMagazineException;
 import product.dto.ComputerConfiguration;
 import product.dto.SmartphoneConfiguration;
 
+import java.math.BigDecimal;
+
 public interface CartService {
     /**
      * Retrieves the entire cart for a specific client.
@@ -54,4 +56,12 @@ public interface CartService {
      * @throws NotEnoughQuantityInMagazineException if there is insufficient stock.
      */
     void addSmartphoneToCart(AddToCartRequest request, SmartphoneConfiguration configuration);
+
+    /**
+     * Calculates the total cost of all products currently in the client's cart.
+     *
+     * @param clientId The ID of the client.
+     * @return The total cost as {@link java.math.BigDecimal}.
+     */
+    BigDecimal getCartTotalPrice(Long clientId);
 }

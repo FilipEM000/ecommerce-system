@@ -104,7 +104,7 @@ public class ProductServiceImplTest {
         when(productRepository.findById(1L)).thenReturn(Optional.of(
                 new Computer("name", new BigDecimal("199.99"), 10)));
 
-        var expectedResult = new Computer("name", new BigDecimal("199.99"), 15);
+        Computer expectedResult = new Computer("name", new BigDecimal("199.99"), 15);
         productServiceImpl.updateProductQuantity(1L, 15);
 
         var result = productRepository.findById(1L).get();

@@ -1,5 +1,6 @@
 package client.validator;
 
+import client.repository.ClientRepository;
 import exception.InvalidClientDataException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,12 @@ public final class ClientValidator {
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
             throw new InvalidClientDataException("Podany adres e-mail ma nieprawidłowy format");
+        }
+    }
+
+    public static void validateEmailNotTaken(String email, ClientRepository clientRepository) {
+        if (clientRepository.findByEmail(email).isPresent()) {
+            throw new exception.EmailAlreadyExistsException("Konto z adresem " + email + " już istnieje.");
         }
     }
 }

@@ -24,7 +24,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Long login(String email) {
-        Client client = clientRepository.findByEmail(email)
+        Client client = clientRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta z mailem " + email));
 
         return client.getId();
@@ -32,9 +32,12 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDto register(String email, String name) {
-        ClientValidator.validateRegistration(email, name);
+        String normalizedEmail = email.trim().toLowerCase();
 
-        Client client = new Client(name, email);
+        ClientValidator.validateRegistration(normalizedEmail, name);
+        ClientValidator.validateEmailNotTaken(normalizedEmail, clientRepository);
+
+        Client client = new Client(name, normalizedEmail);
         Client savedClient = clientRepository.save(client);
         return ClientMapper.mapToDto(savedClient);
     }

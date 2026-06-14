@@ -1,6 +1,6 @@
 package order.entity;
 
-import order.timeConfig.TimeConfig;
+import config.TimeConfig;
 
 import java.time.ZonedDateTime;
 
