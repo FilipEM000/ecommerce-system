@@ -20,6 +20,7 @@ import product.entity.smartphone.Color;
 import product.entity.smartphone.Smartphone;
 import product.repository.ProductRepository;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 
 @AllArgsConstructor
@@ -82,6 +83,14 @@ public class CartServiceImpl implements CartService {
                 new HashSet<>());
 
         client.getCart().getProducts().merge(configuredSmartphone, request.quantity(), Integer::sum);
+    }
+
+    @Override
+    public BigDecimal getCartTotalPrice(Long clientId) {
+        Cart cart = getAllProductsInCart(clientId);
+        return cart.getProducts().entrySet().stream()
+                .map(entry -> entry.getKey().getTotalPrice().multiply(BigDecimal.valueOf(entry.getValue())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Client findClientOrThrow(Long clientId) {

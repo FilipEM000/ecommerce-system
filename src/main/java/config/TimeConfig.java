@@ -1,4 +1,4 @@
-package order.timeConfig;
+package config;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

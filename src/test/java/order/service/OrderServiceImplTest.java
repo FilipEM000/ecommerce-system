@@ -66,6 +66,8 @@ public class OrderServiceImplTest {
 
         when(discountService.getPolicyForCode(any()))
                 .thenReturn(totalCost -> BigDecimal.ZERO);
+        when(cartService.getCartTotalPrice(any()))
+                .thenReturn(new BigDecimal("999.99"));
     }
 
     @Test

@@ -4,7 +4,7 @@ import client.entity.Client;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import order.timeConfig.TimeConfig;
+import config.TimeConfig;
 import product.entity.Product;
 
 import java.math.BigDecimal;

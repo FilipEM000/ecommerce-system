@@ -1,12 +1,12 @@
 [ {
   "id" : 0,
-  "clientName" : "2dqw",
-  "cost" : 2599.98,
-  "orderDate" : "2026-06-10 16:16:42",
+  "clientName" : "Filip",
+  "cost" : 3899.97,
+  "orderDate" : "2026-06-14 19:51:12 CEST",
   "items" : [ {
     "name" : "Samsung Odyssey G5",
     "type" : "Electronics",
     "price" : 1299.99,
-    "quantity" : 2
+    "quantity" : 3
   } ]
 } ]

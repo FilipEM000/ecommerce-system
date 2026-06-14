@@ -50,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
             throw new EmptyCartException("Nie można złożyć zamówienia, koszyk jest pusty");
         }
 
-        BigDecimal cartCost = getTotalCartCost(cart);
+        BigDecimal cartCost = cartService.getCartTotalPrice(clientId);
 
         DiscountPolicy policy = discountService.getPolicyForCode(promoCode);
         BigDecimal discount = policy.calculateDiscount(cartCost);
@@ -75,6 +75,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void processCart(Cart cart) {
+        Map<Product, Integer> stockToDecrement = new HashMap<>();
+
         cart.getProducts().forEach((configuredProduct, quantityInCart) -> {
             Product masterProduct = findProductOrThrow(configuredProduct.getId());
 
@@ -82,19 +84,15 @@ public class OrderServiceImpl implements OrderService {
                 if (masterProduct.getQuantity() < quantityInCart) {
                     throw new NotEnoughQuantityInMagazineException("Nie ma wystarczająco produktu na stanie");
                 }
+            }
+            stockToDecrement.put(masterProduct, quantityInCart);
+        });
 
+        stockToDecrement.forEach((masterProduct, quantityInCart) -> {
+            synchronized (masterProduct) {
                 masterProduct.setQuantity(masterProduct.getQuantity() - quantityInCart);
             }
         });
-    }
-
-    private BigDecimal getTotalCartCost(Cart cart) {
-        return cart.getProducts().entrySet().stream()
-                .map(entry -> {
-                    Product configuredProduct = entry.getKey();
-                    return configuredProduct.getTotalPrice().multiply(BigDecimal.valueOf(entry.getValue()));
-                })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Product findProductOrThrow(Long productId) {

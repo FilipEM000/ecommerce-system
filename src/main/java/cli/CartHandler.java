@@ -65,6 +65,8 @@ public class CartHandler {
                         + product.getDetails());
                 System.out.println("   Cena za sztukę: " + product.getTotalPrice() + " PLN");
             });
+            System.out.println("----------------------------------------");
+            System.out.println("SUMA: " + cartService.getCartTotalPrice(clientId) + " PLN");
         }
     }
 
