@@ -29,7 +29,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService {
+public final class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final ProductRepository productRepository;
@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderFileWriter orderFileWriter;
     private final DiscountService discountService;
     private final ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
-
 
     @Override
     public OrderDto placeOrder(Long clientId, String promoCode) {

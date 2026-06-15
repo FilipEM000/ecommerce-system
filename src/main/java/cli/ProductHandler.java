@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 @AllArgsConstructor
-public class ProductHandler {
+public final class ProductHandler {
     private final ProductService productService;
     private final Scanner scanner;
 

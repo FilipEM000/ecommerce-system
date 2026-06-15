@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import java.util.Scanner;
 
 @AllArgsConstructor
-public class AuthHandler {
+public final class AuthHandler {
     private final ClientService clientService;
     private final Scanner scanner;
 

@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryProductRepository implements ProductRepository {
-    private Map<Long, Product> products = new ConcurrentHashMap<>();
-    private AtomicLong productCounter = new AtomicLong(0);
+    private final Map<Long, Product> products = new ConcurrentHashMap<>();
+    private final AtomicLong productCounter = new AtomicLong(0);
 
     public Product save(Product product) {
         if (product.getId() == null) {

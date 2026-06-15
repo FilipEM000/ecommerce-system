@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 
 @AllArgsConstructor
-public class ThresholdDiscountPolicy implements DiscountPolicy {
+public final class ThresholdDiscountPolicy implements DiscountPolicy {
     private final BigDecimal threshold;
     private final BigDecimal discountAmount;
 

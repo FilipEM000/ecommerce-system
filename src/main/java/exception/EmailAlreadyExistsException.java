@@ -1,6 +1,6 @@
 package exception;
 
-public class EmailAlreadyExistsException extends RuntimeException {
+public final class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String message) {
         super(message);
     }

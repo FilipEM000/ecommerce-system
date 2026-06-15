@@ -4,7 +4,7 @@ import client.entity.Client;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import config.TimeConfig;
+import common.TimeConfig;
 import product.entity.Product;
 
 import java.math.BigDecimal;
@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Getter
 @EqualsAndHashCode
-public class Order {
+public final class Order {
     @Setter
     private Long id;
     private Client client;

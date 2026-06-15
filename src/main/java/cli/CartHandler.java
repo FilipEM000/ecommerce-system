@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 @AllArgsConstructor
-public class CartHandler {
+public final class CartHandler {
     private final CartService cartService;
     private final ProductService productService;
     private final Scanner scanner;
@@ -74,12 +74,22 @@ public class CartHandler {
         System.out.println("--- KONFIGURACJA KOMPUTERA ---");
         System.out.println("Dostępne procesory:");
         Arrays.stream(ProcessorType.values())
-                .forEach(processorType -> System.out.println(processorType.name()));
+                .forEach(processor -> {
+                    String costInfo = processor.getAdditionalCost().compareTo(java.math.BigDecimal.ZERO) == 0
+                            ? " (w cenie)"
+                            : " (+ " + processor.getAdditionalCost() + " PLN)";
+                    System.out.println(" - " + processor.name() + costInfo);
+                });
         System.out.print("Wpisz procesor: ");
         String processor = scanner.nextLine().toUpperCase();
         System.out.println("Dostępny RAM:");
         Arrays.stream(Ram.values())
-                .forEach(ram -> System.out.println(ram.name()));
+                .forEach(ram -> {
+                    String costInfo = ram.getAdditionalCost().compareTo(java.math.BigDecimal.ZERO) == 0
+                            ? " (w cenie)"
+                            : " (+ " + ram.getAdditionalCost() + " PLN)";
+                    System.out.println(" - " + ram.name() + costInfo);
+                });
         System.out.print("Wpisz RAM: ");
         String ram = scanner.nextLine().toUpperCase();
 
@@ -91,12 +101,17 @@ public class CartHandler {
         System.out.println("--- KONFIGURACJA SMARTFONA ---");
         System.out.println("Dostępne kolory:");
         Arrays.stream(Color.values())
-                .forEach(color -> System.out.println(color.name()));
+                .forEach(color -> System.out.println(" - " + color.name() + " (w cenie)"));
         System.out.print("Wpisz kolor: ");
         String color = scanner.nextLine().toUpperCase();
         System.out.println("Dostępne baterie:");
         Arrays.stream(BatteryCapacity.values())
-                .forEach(batteryCapacity -> System.out.println(batteryCapacity.name()));
+                .forEach(battery -> {
+                    String costInfo = battery.getAdditionalCost().compareTo(java.math.BigDecimal.ZERO) == 0
+                            ? " (w cenie)"
+                            : " (+ " + battery.getAdditionalCost() + " PLN)";
+                    System.out.println(" - " + battery.name() + costInfo);
+                });
         System.out.print("Wpisz baterię: ");
         String battery = scanner.nextLine().toUpperCase();
 

@@ -42,6 +42,5 @@ public class OrderFileWriterTestIT {
         assertThat(fileContent).contains("\"cost\" : 2000");
         assertThat(fileContent).contains("\"name\" : \"Dell\"");
         assertThat(fileContent).contains("\"quantity\" : 2");
-
     }
 }

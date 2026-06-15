@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 
 @RequiredArgsConstructor
-public class DiscountService {
+public final class DiscountService {
     private final DiscountRepository discountRepository;
 
 

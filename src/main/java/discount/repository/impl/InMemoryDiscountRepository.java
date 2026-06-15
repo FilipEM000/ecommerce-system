@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class InMemoryDiscountRepository implements DiscountRepository {
+public final class InMemoryDiscountRepository implements DiscountRepository {
     private final Map<String, DiscountPolicy> activePromoCodes = new ConcurrentHashMap<>();
 
     @Override

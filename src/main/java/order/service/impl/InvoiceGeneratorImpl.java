@@ -9,7 +9,7 @@ import order.service.InvoiceGenerator;
 import java.time.LocalDate;
 
 @AllArgsConstructor
-public class InvoiceGeneratorImpl implements InvoiceGenerator {
+public final class InvoiceGeneratorImpl implements InvoiceGenerator {
     private final InvoiceRepository invoiceRepository;
 
     @Override

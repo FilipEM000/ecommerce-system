@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @AllArgsConstructor
-public class ProductServiceImpl implements ProductService {
+public final class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     @Override

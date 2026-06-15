@@ -1,12 +1,17 @@
 [ {
   "id" : 0,
   "clientName" : "Filip",
-  "cost" : 3899.97,
-  "orderDate" : "2026-06-14 19:51:12 CEST",
+  "cost" : 17729.964,
+  "orderDate" : "2026-06-15 19:37:41 CEST",
   "items" : [ {
-    "name" : "Samsung Odyssey G5",
-    "type" : "Electronics",
-    "price" : 1299.99,
-    "quantity" : 3
+    "name" : "Lenovo ThinkPad E14",
+    "type" : "Computer",
+    "price" : 4849.99,
+    "quantity" : 2
+  }, {
+    "name" : "iPhone 15",
+    "type" : "Smartphone",
+    "price" : 4999.99,
+    "quantity" : 2
   } ]
 } ]

@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryOrderRepository implements OrderRepository {
-    private Map<Long, Order> orders = new ConcurrentHashMap<>();
-    private AtomicLong orderCounter = new AtomicLong(0);
+    private final Map<Long, Order> orders = new ConcurrentHashMap<>();
+    private final AtomicLong orderCounter = new AtomicLong(0);
 
     public Order save(Order order) {
         if (order.getId() == null) {
