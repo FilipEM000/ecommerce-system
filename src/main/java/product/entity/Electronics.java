@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class Electronics extends Product {
+public final class Electronics extends Product {
 
     public Electronics(String name, BigDecimal price, Integer quantity) {
         super(name, price, quantity);

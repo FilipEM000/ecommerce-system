@@ -10,7 +10,7 @@ import java.util.Set;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class Smartphone extends Product {
+public final class Smartphone extends Product {
     private Color color;
     private BatteryCapacity batteryCapacity;
     private Set<Accessory> accessories;

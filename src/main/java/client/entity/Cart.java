@@ -9,8 +9,8 @@ import java.util.Map;
 
 @Getter
 @ToString
-public class Cart {
-    private Map<Product, Integer> products;
+public final class Cart {
+    private final Map<Product, Integer> products;
 
     public Cart(){
         this.products = new HashMap<>();

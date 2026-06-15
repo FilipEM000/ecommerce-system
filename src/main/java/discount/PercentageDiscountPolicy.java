@@ -2,7 +2,7 @@ package discount;
 
 import java.math.BigDecimal;
 
-public class PercentageDiscountPolicy implements DiscountPolicy {
+public final class PercentageDiscountPolicy implements DiscountPolicy {
     private final BigDecimal discountMultiplier;
 
     public PercentageDiscountPolicy(double percentageOff) {
@@ -11,6 +11,7 @@ public class PercentageDiscountPolicy implements DiscountPolicy {
 
     @Override
     public BigDecimal calculateDiscount(BigDecimal totalCost) {
-        return totalCost.multiply(discountMultiplier);
+        return totalCost.multiply(discountMultiplier)
+                .setScale(2, java.math.RoundingMode.HALF_UP);
     }
 }

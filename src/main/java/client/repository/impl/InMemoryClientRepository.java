@@ -10,8 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryClientRepository implements ClientRepository {
-    private Map<Long, Client> clients = new ConcurrentHashMap<>();
-    private AtomicLong clientCounter = new AtomicLong(0);
+    private final Map<Long, Client> clients = new ConcurrentHashMap<>();
+    private final AtomicLong clientCounter = new AtomicLong(0);
 
     public Client save(Client client) {
         if (client.getId() == null) {

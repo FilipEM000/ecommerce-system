@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.util.HashSet;
 
 @AllArgsConstructor
-public class CartServiceImpl implements CartService {
+public final class CartServiceImpl implements CartService {
     private final ProductRepository productRepository;
     private final ClientRepository clientRepository;
 

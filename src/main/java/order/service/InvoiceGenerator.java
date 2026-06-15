@@ -4,5 +4,5 @@ import order.entity.Invoice;
 import order.entity.Order;
 
 public interface InvoiceGenerator {
-    public Invoice generateInvoice(Order order);
+    Invoice generateInvoice(Order order);
 }

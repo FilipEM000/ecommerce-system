@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Getter
-public class Computer extends Product {
+public final class Computer extends Product {
     private ProcessorType processor;
     private Ram ram;
 

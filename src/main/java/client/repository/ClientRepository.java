@@ -6,15 +6,15 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface ClientRepository {
-    public Client save(Client client);
+    Client save(Client client);
 
-    public void remove(Client client);
+    void remove(Client client);
 
-    public Optional<Client> findById(Long clientId);
+    Optional<Client> findById(Long clientId);
 
-    public Optional<Client> findByEmail(String email);
+    Optional<Client> findByEmail(String email);
 
-    public Map<Long, Client> findAll();
+    Map<Long, Client> findAll();
 
-    public Long getNextId();
+    Long getNextId();
 }

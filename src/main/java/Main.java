@@ -32,7 +32,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
+public final class Main {
     public static void main(String[] args) {
         ClientRepository clientRepository = new InMemoryClientRepository();
         InvoiceRepository invoiceRepository = new InMemoryInvoiceRepository();

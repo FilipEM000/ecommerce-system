@@ -1,6 +1,6 @@
 package exception;
 
-public class InvalidClientDataException extends RuntimeException {
+public final class InvalidClientDataException extends RuntimeException {
     public InvalidClientDataException(String message) {
         super(message);
     }

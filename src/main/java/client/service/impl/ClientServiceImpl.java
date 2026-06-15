@@ -10,7 +10,7 @@ import exception.ClientNotFoundException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ClientServiceImpl implements ClientService {
+public final class ClientServiceImpl implements ClientService {
     private final ClientRepository clientRepository;
 
 
