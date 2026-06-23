@@ -24,8 +24,7 @@ public final class ProductServiceImpl implements ProductService {
 
     @Override
     public void deleteProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+        Product product = findProduct(productId);
 
         productRepository.remove(product);
     }
@@ -33,8 +32,7 @@ public final class ProductServiceImpl implements ProductService {
     @Override
     public void updateProductPrice(Long productId, BigDecimal newPrice) {
         ProductValidator.validatePrice(newPrice);
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+        Product product = findProduct(productId);
 
         product.setPrice(newPrice);
     }
@@ -43,40 +41,41 @@ public final class ProductServiceImpl implements ProductService {
     public void updateProductQuantity(Long productId, int newQuantity) {
         ProductValidator.validateQuantity(newQuantity);
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+        Product product = findProduct(productId);
 
         product.setQuantity(newQuantity);
     }
 
     @Override
     public List<ProductDto> getAllProducts() {
-        return productRepository.findAll().values().stream()
+        return productRepository.findAll().stream()
                 .map(ProductMapper::mapToDto)
                 .toList();
     }
 
     @Override
     public List<ProductDto> getProductsByName(String name) {
-        return productRepository.findAll().values().stream()
-                .filter(product -> product.getName().toLowerCase().contains(name.toLowerCase()))
+        return productRepository.findByName(name).stream()
                 .map(ProductMapper::mapToDto)
                 .toList();
     }
 
     @Override
     public List<ProductDto> getProductsByType(String type) {
-        return productRepository.findAll().values().stream()
-                .filter(product -> product.getProductType().toLowerCase().contains(type.toLowerCase()))
+        return productRepository.findByType(type).stream()
                 .map(ProductMapper::mapToDto)
                 .toList();
     }
 
     @Override
     public ProductDto getProductById(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
+        Product product = findProduct(productId);
 
         return ProductMapper.mapToDto(product);
+    }
+
+    private Product findProduct(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
     }
 }

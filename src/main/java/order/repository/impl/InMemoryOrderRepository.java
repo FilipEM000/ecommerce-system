@@ -4,6 +4,7 @@ import order.entity.Order;
 import order.repository.OrderRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,23 +18,19 @@ public final class InMemoryOrderRepository implements OrderRepository {
         if (order.getId() == null) {
             order.setId(getNextId());
         }
-        orders.putIfAbsent(order.getId(), order);
+        orders.put(order.getId(), order);
         return order;
-    }
-
-    public void remove(Order order) {
-        orders.remove(order.getId());
     }
 
     public Optional<Order> findById(Long orderId) {
         return Optional.ofNullable(orders.get(orderId));
     }
 
-    public Map<Long, Order> findAll() {
-        return Collections.unmodifiableMap(orders);
+    public List<Order> findAll() {
+        return List.copyOf(orders.values());
     }
 
-    public Long getNextId() {
+    private Long getNextId() {
         return orderCounter.getAndIncrement();
     }
 }

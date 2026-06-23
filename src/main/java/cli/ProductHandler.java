@@ -19,12 +19,15 @@ public final class ProductHandler {
                 3 - filtruj po typie
                 0 - powrót do menu
                 """);
-        int option = scanner.nextInt();
-        scanner.nextLine();
+        int option = Integer.parseInt(scanner.nextLine());
         switch (option) {
             case 1 -> {
                 List<ProductDto> products = productService.getAllProducts();
-                products.forEach(System.out::println);
+                if (products.isEmpty()) {
+                    System.out.println("Brak dostępnych produktów.");
+                } else {
+                    products.forEach(System.out::println);
+                }
             }
             case 2 -> {
                 System.out.println("Podaj nazwę produktu");
@@ -46,6 +49,7 @@ public final class ProductHandler {
                     products.forEach(System.out::println);
                 }
             }
+            default -> System.out.println("Nieprawidłowa opcja. Wybierz liczbę od 0 do 3.");
         }
     }
 }

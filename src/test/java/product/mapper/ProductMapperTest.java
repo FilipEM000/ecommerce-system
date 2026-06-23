@@ -3,6 +3,7 @@ package product.mapper;
 import org.junit.jupiter.api.Test;
 import product.dto.ProductDto;
 import product.entity.Product;
+import product.entity.ProductType;
 import product.entity.computer.Computer;
 
 import java.math.BigDecimal;
@@ -22,7 +23,7 @@ public class ProductMapperTest {
                 1L,
                 "Dell XPS",
                 new BigDecimal("5000"),
-                "Computer",
+                ProductType.COMPUTER,
                 "processor: INTEL_CORE_I5, ram:  DDR4_8_2400"));
     }
 }

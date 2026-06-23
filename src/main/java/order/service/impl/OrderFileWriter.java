@@ -32,8 +32,8 @@ public final class OrderFileWriter {
         List<OrderItemEntry> items = order.getProducts().entrySet().stream()
                 .map(entry -> new OrderItemEntry(
                         entry.getKey().getName(),
-                        entry.getKey().getProductType(),
-                        entry.getKey().getTotalPrice(),
+                        entry.getKey().getProductType().name(),
+                        entry.getKey().getPrice(),
                         entry.getValue()))
                 .toList();
 

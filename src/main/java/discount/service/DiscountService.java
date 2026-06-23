@@ -2,6 +2,7 @@ package discount.service;
 
 import discount.DiscountPolicy;
 import discount.repository.DiscountRepository;
+import discount.validator.DiscountValidator;
 import exception.InvalidPromoCodeException;
 import lombok.RequiredArgsConstructor;
 
@@ -17,14 +18,12 @@ public final class DiscountService {
             return totalCost -> BigDecimal.ZERO;
         }
 
-        return discountRepository.findByCode(code)
+        return discountRepository.findByCode(code.trim().toUpperCase())
                 .orElseThrow(() -> new InvalidPromoCodeException("Kod rabatowy " + code + " nie istnieje."));
     }
 
     public void addNewPromoCode(String code, DiscountPolicy discountPolicy) {
-        if (code == null || code.isBlank()) {
-            throw new IllegalArgumentException("Kod rabatowy nie może być pusty");
-        }
-        discountRepository.save(code, discountPolicy);
+        DiscountValidator.validatePromoCode(code, discountPolicy);
+        discountRepository.save(code.trim().toUpperCase(), discountPolicy);
     }
 }

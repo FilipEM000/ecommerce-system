@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DiscountPolicyTest {
     @Test
     void shouldCalculatePercentageDiscount() {
-        DiscountPolicy policy = new PercentageDiscountPolicy(0.10);
+        DiscountPolicy policy = new PercentageDiscountPolicy(new BigDecimal("0.10"));
         BigDecimal cartCost = new BigDecimal("1000.00");
 
         BigDecimal discount = policy.calculateDiscount(cartCost);

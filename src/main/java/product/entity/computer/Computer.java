@@ -1,8 +1,10 @@
 package product.entity.computer;
 
-import product.entity.Product;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import product.entity.Product;
+import product.entity.ProductType;
+import product.validator.ProductValidator;
 
 import java.math.BigDecimal;
 
@@ -12,7 +14,7 @@ public final class Computer extends Product {
     private ProcessorType processor;
     private Ram ram;
 
-    public Computer(String name, BigDecimal price, Integer quantity) {
+    public Computer(String name, BigDecimal price, int quantity) {
         super(name, price, quantity);
         this.processor = ProcessorType.INTEL_CORE_I5;
         this.ram = Ram.DDR4_8_2400;
@@ -25,18 +27,14 @@ public final class Computer extends Product {
     }
 
     public void configure(ProcessorType processor, Ram ram) {
+        ProductValidator.validateComputerConfiguration(processor, ram);
         this.processor = processor;
         this.ram = ram;
-    }
 
-    @Override
-    public BigDecimal getTotalPrice(){
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
-        totalPrice = totalPrice.add(processor.getAdditionalCost());
-        totalPrice = totalPrice.add(ram.getAdditionalCost());
-
-        return super.getTotalPrice().add(totalPrice);
+        BigDecimal newPrice = getPrice()
+                .add(processor.getAdditionalCost())
+                .add(ram.getAdditionalCost());
+        setPrice(newPrice);
     }
 
     @Override
@@ -45,8 +43,8 @@ public final class Computer extends Product {
     }
 
     @Override
-    public String getProductType() {
-        return "Computer";
+    public ProductType getProductType() {
+        return ProductType.COMPUTER;
     }
 
     @Override

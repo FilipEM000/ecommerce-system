@@ -1,22 +1,23 @@
 package client.entity;
 
 
-import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-@Setter()
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class Client {
+    @EqualsAndHashCode.Include
+    @Setter
     private Long id;
     private String name;
     private String email;
-    @Setter(AccessLevel.NONE)
     private Cart cart;
 
-    public Client(String name, String email){
+    public Client(String name, String email) {
         this.name = name;
         this.email = email;
-        this.cart = new Cart();
+        this.cart = Cart.initialize();
     }
 }

@@ -1,12 +1,13 @@
 package product.entity.computer;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Ram {
     DDR4_8_2400("DDR4", 8, 2400, BigDecimal.ZERO),
     DDR4_16_3200("DDR4", 16, 3200, new BigDecimal("150")),

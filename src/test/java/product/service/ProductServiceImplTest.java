@@ -51,9 +51,13 @@ public class ProductServiceImplTest {
                 new Computer("asus", new BigDecimal("999"), 10)));
 
         productServiceImpl.deleteProduct(1L);
-        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
 
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
         verify(productRepository).remove(productCaptor.capture());
+
+        Product captured = productCaptor.getValue();
+        assertThat(captured.getName()).isEqualTo("asus");
+        assertThat(captured.getPrice()).isEqualByComparingTo("999");
     }
 
     @Test

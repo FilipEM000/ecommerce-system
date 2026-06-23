@@ -44,7 +44,7 @@ public class InMemoryClientRepositoryTest {
         client.getCart().getProducts().put(null, 1);
         Client updatedClient = clientRepository.save(client);
 
-        assertThat(updatedClient.getId()).isEqualTo(0L);
+        assertThat(updatedClient.getId()).isEqualTo(1L);
         assertThat(clientRepository.findAll()).hasSize(1);
     }
 }

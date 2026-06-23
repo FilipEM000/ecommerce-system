@@ -27,6 +27,7 @@ import product.repository.ProductRepository;
 import product.repository.impl.InMemoryProductRepository;
 
 import java.math.BigDecimal;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -52,7 +53,8 @@ public class OrderServiceTestIT {
                 cartService,
                 new InvoiceGeneratorImpl(new InMemoryInvoiceRepository()),
                 new OrderFileWriter("test_orders.json"),
-                discountService
+                discountService,
+                Executors.newSingleThreadExecutor()
         );
 
         client = clientRepository.save(new Client("Filip", "filip@wp.pl"));
@@ -73,7 +75,7 @@ public class OrderServiceTestIT {
 
     @Test
     void shouldApplyPercentageDiscount() {
-        discountService.addNewPromoCode("RABAT20", new PercentageDiscountPolicy(0.20));
+        discountService.addNewPromoCode("RABAT20", new PercentageDiscountPolicy(new BigDecimal("0.20")));
         cartService.addStandardProductToCart(new AddToCartRequest(client.getId(), computer.getId(), 1));
 
         OrderDto order = orderService.placeOrder(client.getId(), "RABAT20");

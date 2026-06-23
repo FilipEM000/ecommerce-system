@@ -4,6 +4,7 @@ import product.entity.Product;
 import product.repository.ProductRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,11 +30,23 @@ public final class InMemoryProductRepository implements ProductRepository {
         return Optional.ofNullable(products.get(id));
     }
 
-    public Map<Long, Product> findAll() {
-        return Collections.unmodifiableMap(products);
+    public List<Product> findAll() {
+        return List.copyOf(products.values());
     }
 
-    public Long getNextId() {
+    public List<Product> findByName(String name) {
+        return products.values().stream()
+                .filter(product -> product.getName().toLowerCase().startsWith(name.toLowerCase()))
+                .toList();
+    }
+
+    public List<Product> findByType(String type) {
+        return products.values().stream()
+                .filter(product -> product.getProductType().name().equalsIgnoreCase(type))
+                .toList();
+    }
+
+    private Long getNextId() {
         return productCounter.getAndIncrement();
     }
 }

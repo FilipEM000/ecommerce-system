@@ -23,8 +23,8 @@ public final class Electronics extends Product {
     }
 
     @Override
-    public String getProductType() {
-        return "Electronics";
+    public ProductType getProductType() {
+        return ProductType.ELECTRONICS;
     }
 
     @Override

@@ -1,12 +1,15 @@
 package discount;
 
+import discount.validator.DiscountValidator;
+
 import java.math.BigDecimal;
 
 public final class PercentageDiscountPolicy implements DiscountPolicy {
     private final BigDecimal discountMultiplier;
 
-    public PercentageDiscountPolicy(double percentageOff) {
-        this.discountMultiplier = BigDecimal.valueOf(percentageOff);
+    public PercentageDiscountPolicy(BigDecimal  percentageOff) {
+        DiscountValidator.validatePercentage(percentageOff);
+        this.discountMultiplier = percentageOff;
     }
 
     @Override

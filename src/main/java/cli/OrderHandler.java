@@ -1,5 +1,9 @@
 package cli;
 
+import exception.ClientNotFoundException;
+import exception.EmptyCartException;
+import exception.InvalidPromoCodeException;
+import exception.NotEnoughQuantityInMagazineException;
 import lombok.AllArgsConstructor;
 import order.dto.OrderDto;
 import order.service.OrderService;
@@ -26,7 +30,8 @@ public final class OrderHandler {
             OrderDto order = orderService.placeOrder(clientId, promoCode);
             String formattedDate = order.orderDate().format(DATE_TIME_FORMATTER);
             printInvoice(order, formattedDate);
-        } catch (Exception e) {
+        } catch (EmptyCartException | ClientNotFoundException |
+                 NotEnoughQuantityInMagazineException | InvalidPromoCodeException e) {
             System.out.println("Błąd składania zamówienia: " + e.getMessage());
         }
     }
