@@ -31,6 +31,8 @@ import product.service.impl.ProductServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class Main {
     public static void main(String[] args) {
@@ -45,7 +47,8 @@ public final class Main {
         ClientService clientService = new ClientServiceImpl(clientRepository);
         OrderFileWriter orderFileWriter = new OrderFileWriter("orders.json");
         InvoiceGenerator invoiceGenerator = new InvoiceGeneratorImpl(invoiceRepository);
-        OrderServiceImpl orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService);
+        ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
+        OrderServiceImpl orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService, asyncExecutor);
         ProductService productService = new ProductServiceImpl(productRepository);
 
         Scanner scanner = new Scanner(System.in);
@@ -56,7 +59,7 @@ public final class Main {
 
         ConsoleApp consoleApp = new ConsoleApp(authHandler, productHandler, cartHandler, orderHandler, scanner);
 
-        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(0.10));
+        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(new BigDecimal("0.10")));
         discountService.addNewPromoCode("BOGACZ200", new ThresholdDiscountPolicy(new BigDecimal("5000"), new BigDecimal("200")));
 
         List<Product> products = List.of(

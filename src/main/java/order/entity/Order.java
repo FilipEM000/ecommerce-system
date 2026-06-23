@@ -1,20 +1,22 @@
 package order.entity;
 
 import client.entity.Client;
+import common.TimeConfig;
+import exception.IDAlreadyExistException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
-import common.TimeConfig;
 import product.entity.Product;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public final class Order {
-    @Setter
+    @EqualsAndHashCode.Include
     private Long id;
     private Client client;
     private Map<Product, Integer> products;
@@ -23,8 +25,19 @@ public final class Order {
 
     public Order(Client client, Map<Product, Integer> products, BigDecimal cost) {
         this.client = client;
-        this.products = products;
+        this.products = new HashMap<>(products);
         this.cost = cost;
         this.orderDate = ZonedDateTime.now(TimeConfig.APP_ZONE);
+    }
+
+    public void setId(Long id) {
+        if (this.id != null) {
+            throw new IDAlreadyExistException("ID zamówienia zostało już nadane");
+        }
+        this.id = id;
+    }
+
+    public Map<Product, Integer> getProducts() {
+        return Collections.unmodifiableMap(products);
     }
 }

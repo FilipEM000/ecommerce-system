@@ -29,18 +29,16 @@ public final class CartHandler {
 
     public void handleAddToCart(Long clientId) {
         System.out.println("Podaj id produktu, który chcesz dodać do koszyka");
-        Long productId = scanner.nextLong();
-        scanner.nextLine();
+        Long productId = Long.parseLong(scanner.nextLine());
         try {
             ProductDto product = productService.getProductById(productId);
             System.out.println("Podaj ilość, którą chcesz dodać:");
-            int quantity = scanner.nextInt();
-            scanner.nextLine();
+            int quantity = Integer.parseInt(scanner.nextLine());
 
             AddToCartRequest request = new AddToCartRequest(clientId, productId, quantity);
             switch (product.type()) {
-                case "Computer" -> addComputerToCart(request);
-                case "Smartphone" -> addSmartphoneToCart(request);
+                case COMPUTER -> addComputerToCart(request);
+                case SMARTPHONE -> addSmartphoneToCart(request);
                 default -> {
                     cartService.addStandardProductToCart(request);
                     System.out.println("Dodano produkt do koszyka!");
@@ -63,7 +61,7 @@ public final class CartHandler {
                         + " (" + product.getProductType()
                         + ") - Ilość: " + quantity + " szt. || "
                         + product.getDetails());
-                System.out.println("   Cena za sztukę: " + product.getTotalPrice() + " PLN");
+                System.out.println("   Cena za sztukę: " + product.getPrice() + " PLN");
             });
             System.out.println("----------------------------------------");
             System.out.println("SUMA: " + cartService.getCartTotalPrice(clientId) + " PLN");

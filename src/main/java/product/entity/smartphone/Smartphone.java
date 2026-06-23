@@ -1,8 +1,10 @@
 package product.entity.smartphone;
 
-import product.entity.Product;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import product.entity.Product;
+import product.entity.ProductType;
+import product.validator.ProductValidator;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -30,21 +32,16 @@ public final class Smartphone extends Product {
     }
 
     public void configure(Color color, BatteryCapacity batteryCapacity, Set<Accessory> accessories) {
+        ProductValidator.validateSmartphoneConfiguration(color, batteryCapacity);
         this.color = color;
         this.batteryCapacity = batteryCapacity;
         this.accessories = accessories;
-    }
 
-    @Override
-    public BigDecimal getTotalPrice(){
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
-        totalPrice = totalPrice.add(batteryCapacity.getAdditionalCost());
+        BigDecimal newPrice = getPrice().add(batteryCapacity.getAdditionalCost());
         for (Accessory accessory : accessories) {
-            totalPrice = totalPrice.add(accessory.getAdditionalCost());
+            newPrice = newPrice.add(accessory.getAdditionalCost());
         }
-
-        return super.getTotalPrice().add(totalPrice);
+        setPrice(newPrice);
     }
 
     @Override
@@ -53,8 +50,8 @@ public final class Smartphone extends Product {
     }
 
     @Override
-    public String getProductType() {
-        return "Smartphone";
+    public ProductType getProductType() {
+        return ProductType.SMARTPHONE;
     }
 
     @Override

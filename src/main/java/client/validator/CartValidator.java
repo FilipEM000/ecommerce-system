@@ -1,14 +1,11 @@
 package client.validator;
 
 import client.entity.Cart;
-import exception.InvalidProductTypeException;
 import exception.InvalidQuantityException;
 import exception.NotEnoughQuantityInMagazineException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import product.entity.Product;
-import product.entity.computer.Computer;
-import product.entity.smartphone.Smartphone;
 
 import java.util.Map;
 
@@ -34,19 +31,5 @@ public final class CartValidator {
                     + ", w koszyku masz już: " + alreadyInCart
                     + ", próbujesz dodać: " + quantityToAdd);
         }
-    }
-
-    public static Computer validateAndCastToComputer(Product product) {
-        if (product instanceof Computer computer) {
-            return computer;
-        }
-        throw new InvalidProductTypeException("Produkt nie jest komputerem");
-    }
-
-    public static Smartphone validateAndCastToSmartphone(Product product) {
-        if (product instanceof Smartphone smartphone) {
-            return smartphone;
-        }
-        throw new InvalidProductTypeException("Ten produkt nie jest smartfonem!");
     }
 }

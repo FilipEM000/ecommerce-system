@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import product.dto.ProductDto;
 import product.entity.Electronics;
+import product.entity.Product;
 import product.entity.computer.Computer;
 import product.entity.smartphone.Smartphone;
 import product.repository.impl.InMemoryProductRepository;
@@ -14,14 +15,17 @@ import product.service.impl.ProductServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ProductServiceTestIT {
     private ProductService productService;
+    private InMemoryProductRepository productRepository;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(new InMemoryProductRepository());
+        productRepository = new InMemoryProductRepository();
+        productService = new ProductServiceImpl(productRepository);
         productService.addProduct(new Computer("Dell XPS 15", new BigDecimal("4999.99"), 10));
         productService.addProduct(new Computer("Lenovo ThinkPad", new BigDecimal("3999.99"), 5));
         productService.addProduct(new Smartphone("iPhone 15", new BigDecimal("4499.99"), 8));
@@ -92,8 +96,11 @@ public class ProductServiceTestIT {
     void shouldUpdateProductQuantity() {
         ProductDto product = productService.getAllProducts().get(0);
 
-        assertThatCode(() -> productService.updateProductQuantity(product.id(), 50))
-                .doesNotThrowAnyException();
+        productService.updateProductQuantity(product.id(), 50);
+
+        Product updatedEntity = productRepository.findById(product.id()).get();
+
+        assertThat(updatedEntity.getQuantity()).isEqualTo(50);
     }
 
     @Test
@@ -102,6 +109,8 @@ public class ProductServiceTestIT {
 
         productService.deleteProduct(product.id());
 
+        assertThat(productRepository.findById(product.id())).isEmpty();
+        assertThat(productService.getAllProducts()).hasSize(3);
         assertThatExceptionOfType(ProductNotFoundException.class)
                 .isThrownBy(() -> productService.getProductById(product.id()));
     }

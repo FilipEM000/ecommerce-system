@@ -1,12 +1,13 @@
 package product.entity.smartphone;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
-@AllArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Accessory {
     CASE(new BigDecimal("20")),
     EARPHONES(new BigDecimal("60")),

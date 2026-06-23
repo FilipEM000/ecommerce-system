@@ -18,6 +18,6 @@ public class ComputerTest {
         computer.configure(ProcessorType.AMD_RYZEN_7, Ram.DDR5_32_5600);
 
         //3000 + 800 + 400
-        assertThat(computer.getTotalPrice()).isEqualTo(new BigDecimal("4200"));
+        assertThat(computer.getPrice()).isEqualTo(new BigDecimal("4200"));
     }
 }

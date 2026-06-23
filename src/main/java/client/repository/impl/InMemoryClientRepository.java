@@ -4,6 +4,7 @@ import client.entity.Client;
 import client.repository.ClientRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public final class InMemoryClientRepository implements ClientRepository {
     private final Map<Long, Client> clients = new ConcurrentHashMap<>();
-    private final AtomicLong clientCounter = new AtomicLong(0);
+    private final AtomicLong clientCounter = new AtomicLong(1);
 
     public Client save(Client client) {
         if (client.getId() == null) {
@@ -35,11 +36,11 @@ public final class InMemoryClientRepository implements ClientRepository {
                 .findFirst();
     }
 
-    public Map<Long, Client> findAll() {
-        return Collections.unmodifiableMap(clients);
+    public List<Client> findAll() {
+        return List.copyOf(clients.values());
     }
 
-    public Long getNextId() {
+    private Long getNextId() {
         return clientCounter.getAndIncrement();
     }
 }

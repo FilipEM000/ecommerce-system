@@ -42,7 +42,7 @@ public class ClientServiceTestIT {
         assertThatExceptionOfType(InvalidClientDataException.class)
                 .isThrownBy(() -> clientService.register("filip", "Filip"))
                 .extracting(InvalidClientDataException::getMessage)
-                .isEqualTo("Podany adres e-mail ma nieprawidłowy format");
+                .isEqualTo("Nieprawidłowy adres email: filip");
     }
 
     @Test

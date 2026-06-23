@@ -18,6 +18,6 @@ public class SmartphoneTest {
 
         phone.configure(Color.BLACK, BatteryCapacity.LARGE, new HashSet<>());
 
-        assertThat(phone.getTotalPrice()).isEqualTo(new BigDecimal("4100"));
+        assertThat(phone.getPrice()).isEqualTo(new BigDecimal("4100"));
     }
 }

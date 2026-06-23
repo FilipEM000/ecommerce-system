@@ -23,9 +23,9 @@ import product.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -37,17 +37,16 @@ public final class OrderServiceImpl implements OrderService {
     private final InvoiceGenerator invoiceGenerator;
     private final OrderFileWriter orderFileWriter;
     private final DiscountService discountService;
-    private final ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
+    private final ExecutorService asyncExecutor;
 
     @Override
     public OrderDto placeOrder(Long clientId, String promoCode) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new ClientNotFoundException("Nie znaleziono klienta o id " + clientId));
-        Cart cart = client.getCart();
 
-        if (cart.getProducts().isEmpty()) {
-            throw new EmptyCartException("Nie można złożyć zamówienia, koszyk jest pusty");
-        }
+        Cart cart = Optional.ofNullable(client.getCart())
+                .filter(c -> !c.getProducts().isEmpty())
+                .orElseThrow(() -> new EmptyCartException("Nie można złożyć zamówienia, koszyk jest pusty"));
 
         BigDecimal cartCost = cartService.getCartTotalPrice(clientId);
 
@@ -55,12 +54,12 @@ public final class OrderServiceImpl implements OrderService {
         BigDecimal discount = policy.calculateDiscount(cartCost);
         BigDecimal finalCost = cartCost.subtract(discount);
 
-        Map<Product, Integer> products = new HashMap<>(cart.getProducts());
         processCart(cart);
-        cartService.clearCart(clientId);
 
-        Order order = new Order(client, products, finalCost);
+        Order order = new Order(client, cart.getProducts(), finalCost);
         Order savedOrder = orderRepository.save(order);
+
+        cartService.clearCart(clientId);
 
         CompletableFuture.runAsync(() -> {
             orderFileWriter.write(savedOrder);
@@ -77,11 +76,12 @@ public final class OrderServiceImpl implements OrderService {
         Map<Product, Integer> stockToDecrement = new HashMap<>();
 
         cart.getProducts().forEach((configuredProduct, quantityInCart) -> {
-            Product masterProduct = findProductOrThrow(configuredProduct.getId());
+            Product masterProduct = findProduct(configuredProduct.getId());
 
             synchronized (masterProduct) {
                 if (masterProduct.getQuantity() < quantityInCart) {
-                    throw new NotEnoughQuantityInMagazineException("Nie ma wystarczająco produktu na stanie");
+                    throw new NotEnoughQuantityInMagazineException(String.format("Brakuje produktu na stanie: %s (wymagane: %d, dostępne: %d)",
+                            masterProduct.getName(), quantityInCart, masterProduct.getQuantity()));
                 }
             }
             stockToDecrement.put(masterProduct, quantityInCart);
@@ -94,7 +94,7 @@ public final class OrderServiceImpl implements OrderService {
         });
     }
 
-    private Product findProductOrThrow(Long productId) {
+    private Product findProduct(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Nie znaleziono produktu o id " + productId));
     }

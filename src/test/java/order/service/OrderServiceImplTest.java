@@ -23,6 +23,7 @@ import product.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -51,6 +52,9 @@ public class OrderServiceImplTest {
 
     @Mock
     DiscountService discountService;
+
+    @Mock
+    ExecutorService executorService;
 
     @InjectMocks
     OrderServiceImpl orderService;
@@ -124,6 +128,6 @@ public class OrderServiceImplTest {
         assertThatExceptionOfType(NotEnoughQuantityInMagazineException.class)
                 .isThrownBy(() -> orderService.placeOrder(1L, null))
                 .extracting(NotEnoughQuantityInMagazineException::getMessage)
-                .isEqualTo("Nie ma wystarczająco produktu na stanie");
+                .isEqualTo("Brakuje produktu na stanie: ASUS (wymagane: 10, dostępne: 5)");
     }
 }

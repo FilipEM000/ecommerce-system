@@ -21,7 +21,7 @@ public class DiscountServiceTestIT {
         InMemoryDiscountRepository repository = new InMemoryDiscountRepository();
         discountService = new DiscountService(repository);
 
-        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(0.1));
+        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(new BigDecimal("0.1")));
     }
 
     @Test
@@ -52,9 +52,9 @@ public class DiscountServiceTestIT {
 
     @Test
     void shouldThrowExceptionWhenAddingEmptyCode() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> discountService.addNewPromoCode("", new PercentageDiscountPolicy(0.10)))
-                .extracting(IllegalArgumentException::getMessage)
+        assertThatExceptionOfType(InvalidPromoCodeException.class)
+                .isThrownBy(() -> discountService.addNewPromoCode("", new PercentageDiscountPolicy(new BigDecimal("0.10"))))
+                .extracting(InvalidPromoCodeException::getMessage)
                 .isEqualTo("Kod rabatowy nie może być pusty");
     }
 }

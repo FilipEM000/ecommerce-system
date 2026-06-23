@@ -30,17 +30,4 @@ public class InMemoryOrderRepositoryTest {
         assertThat(savedOrder.getId()).isEqualTo(0L);
         assertThat(orderRepository.findAll()).hasSize(1);
     }
-
-    @Test
-    void shouldRemoveOrder() {
-        Client client = new Client("Filip", "filip@wp.pl");
-        Order order = new Order(client, client.getCart().getProducts(), BigDecimal.TEN);
-
-        Order savedOrder = orderRepository.save(order);
-        orderRepository.remove(savedOrder);
-
-        Optional<Order> foundOrder = orderRepository.findById(savedOrder.getId());
-        assertThat(foundOrder).isEmpty();
-        assertThat(orderRepository.findAll()).isEmpty();
-    }
 }

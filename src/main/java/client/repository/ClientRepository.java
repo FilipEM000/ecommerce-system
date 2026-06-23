@@ -2,7 +2,7 @@ package client.repository;
 
 import client.entity.Client;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 public interface ClientRepository {
@@ -14,7 +14,5 @@ public interface ClientRepository {
 
     Optional<Client> findByEmail(String email);
 
-    Map<Long, Client> findAll();
-
-    Long getNextId();
+    List<Client> findAll();
 }

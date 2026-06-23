@@ -1,9 +1,7 @@
 package cli;
 
-import client.dto.ClientDto;
 import lombok.RequiredArgsConstructor;
 
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 @RequiredArgsConstructor
@@ -20,15 +18,11 @@ public final class ConsoleApp {
         do {
             try {
                 System.out.println("1 - zaloguj się\n2 - stwórz nowe konto\n0 - wyjdź z programu");
-                option = scanner.nextInt();
-                scanner.nextLine();
+                option = Integer.parseInt(scanner.nextLine());
 
                 switch (option) {
-                    case 1 -> currentClientId = authHandler.handleLogin();
-                    case 2 -> {
-                        ClientDto client = authHandler.handleRegister();
-                        currentClientId = client.id();
-                    }
+                    case 1 -> authHandler.handleLogin().ifPresent(id -> currentClientId = id);
+                    case 2 -> authHandler.handleRegister().ifPresent(client -> currentClientId = client.id());
                     case 0 -> System.out.println("Do zobaczenia!");
                     default -> System.out.println("Nieznana opcja.");
                 }
@@ -37,9 +31,8 @@ public final class ConsoleApp {
                     shopMenuLoop();
                 }
 
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.out.println("Wpisano nieprawidłowy znak");
-                scanner.nextLine();
             } catch (Exception e) {
                 System.out.println("Wystąpił krytyczny błąd: " + e.getMessage());
             }
@@ -51,8 +44,7 @@ public final class ConsoleApp {
         do {
             try {
                 printMenu();
-                shopOption = scanner.nextInt();
-                scanner.nextLine();
+                shopOption = Integer.parseInt(scanner.nextLine());
 
                 switch (shopOption) {
                     case 1 -> productHandler.productsMenu();
@@ -65,9 +57,8 @@ public final class ConsoleApp {
                     }
                     default -> System.out.println("Nieznana opcja");
                 }
-            } catch (InputMismatchException e) {
+            } catch (NumberFormatException e) {
                 System.err.println("Wpisano nieprawidłowy znak");
-                scanner.nextLine();
             } catch (Exception e) {
                 System.err.println("Wystąpił błąd w sklepie: " + e.getMessage());
             }
