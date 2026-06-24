@@ -26,10 +26,10 @@ public class ProductServiceTestIT {
     void setUp() {
         productRepository = new InMemoryProductRepository();
         productService = new ProductServiceImpl(productRepository);
-        productService.addProduct(new Computer("Dell XPS 15", new BigDecimal("4999.99"), 10));
-        productService.addProduct(new Computer("Lenovo ThinkPad", new BigDecimal("3999.99"), 5));
-        productService.addProduct(new Smartphone("iPhone 15", new BigDecimal("4499.99"), 8));
-        productService.addProduct(new Electronics("Logitech MX Master", new BigDecimal("399.99"), 20));
+        productRepository.save(new Computer("Dell XPS 15", new BigDecimal("4999.99"), 10));
+        productRepository.save(new Computer("Lenovo ThinkPad", new BigDecimal("3999.99"), 5));
+        productRepository.save(new Smartphone("iPhone 15", new BigDecimal("4499.99"), 8));
+        productRepository.save(new Electronics("Logitech MX Master", new BigDecimal("399.99"), 20));
     }
 
     @Test
