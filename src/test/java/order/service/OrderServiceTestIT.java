@@ -119,6 +119,8 @@ public class OrderServiceTestIT {
     void shouldReduceStockAfterOrder() {
         cartService.addStandardProductToCart(new AddToCartRequest(client.getId(), computer.getId(), 3));
 
+        assertThat(computer.getQuantity()).isEqualTo(10);
+
         orderService.placeOrder(client.getId(), null);
 
         assertThat(computer.getQuantity()).isEqualTo(7);

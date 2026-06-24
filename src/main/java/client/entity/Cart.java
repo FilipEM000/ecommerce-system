@@ -1,11 +1,13 @@
 package client.entity;
 
+import exception.CartDoesNotExistException;
 import lombok.Getter;
 import lombok.ToString;
 import product.entity.Product;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @ToString

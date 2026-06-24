@@ -7,6 +7,7 @@ import client.entity.Client;
 import client.repository.ClientRepository;
 import client.service.CartService;
 import client.validator.CartValidator;
+import exception.CartDoesNotExistException;
 import exception.ClientNotFoundException;
 import exception.InvalidProductTypeException;
 import exception.ProductNotFoundException;
@@ -24,6 +25,7 @@ import product.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.Objects;
 
 @AllArgsConstructor
 public final class CartServiceImpl implements CartService {
@@ -98,6 +100,11 @@ public final class CartServiceImpl implements CartService {
 
     private CartData validateAndGetCartData(AddToCartRequest request) {
         Client client = findClientOrThrow(request.clientId());
+
+        if (client.getCart() == null) {
+            throw new CartDoesNotExistException("Koszyk klienta nie został poprawnie zainicjalizowany!");
+        }
+
         Product masterProduct = findProduct(request.productId());
         CartValidator.validateQuantityToAdd(client.getCart(), masterProduct, request.quantity());
 

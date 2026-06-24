@@ -21,7 +21,19 @@ public class DiscountServiceTestIT {
         InMemoryDiscountRepository repository = new InMemoryDiscountRepository();
         discountService = new DiscountService(repository);
 
-        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(new BigDecimal("0.1")));
+        repository.save("VIP10", new PercentageDiscountPolicy(new BigDecimal("0.1")));
+    }
+
+    @Test
+    void shouldAddNewPromoCodeSuccessfully() {
+        DiscountPolicy newPolicy = new PercentageDiscountPolicy(new BigDecimal("0.2"));
+        discountService.addNewPromoCode("SUMMER20", newPolicy);
+
+        DiscountPolicy retrievedPolicy = discountService.getPolicyForCode("SUMMER20");
+        BigDecimal discount = retrievedPolicy.calculateDiscount(new BigDecimal("1000"));
+
+        assertThat(discount)
+                .isCloseTo(new BigDecimal("200"), Percentage.withPercentage(0.1));
     }
 
     @Test
