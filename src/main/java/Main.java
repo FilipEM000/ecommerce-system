@@ -1,0 +1,79 @@
+import cli.*;
+import client.repository.ClientRepository;
+import client.repository.impl.InMemoryClientRepository;
+import client.service.CartService;
+import client.service.ClientService;
+import client.service.impl.CartServiceImpl;
+import client.service.impl.ClientServiceImpl;
+import discount.PercentageDiscountPolicy;
+import discount.ThresholdDiscountPolicy;
+import discount.repository.DiscountRepository;
+import discount.repository.impl.InMemoryDiscountRepository;
+import discount.service.DiscountService;
+import order.repository.InvoiceRepository;
+import order.repository.OrderRepository;
+import order.repository.impl.InMemoryInvoiceRepository;
+import order.repository.impl.InMemoryOrderRepository;
+import order.service.InvoiceGenerator;
+import order.service.OrderService;
+import order.service.impl.InvoiceGeneratorImpl;
+import order.service.impl.OrderFileWriter;
+import order.service.impl.OrderServiceImpl;
+import product.entity.Electronics;
+import product.entity.Product;
+import product.entity.computer.Computer;
+import product.entity.smartphone.Smartphone;
+import product.repository.ProductRepository;
+import product.repository.impl.InMemoryProductRepository;
+import product.service.ProductService;
+import product.service.impl.ProductServiceImpl;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public final class Main {
+    public static void main(String[] args) {
+        ClientRepository clientRepository = new InMemoryClientRepository();
+        InvoiceRepository invoiceRepository = new InMemoryInvoiceRepository();
+        OrderRepository orderRepository = new InMemoryOrderRepository();
+        ProductRepository productRepository = new InMemoryProductRepository();
+        DiscountRepository discountRepository = new InMemoryDiscountRepository();
+
+        DiscountService discountService = new DiscountService(discountRepository);
+        CartService cartService = new CartServiceImpl(productRepository, clientRepository);
+        ClientService clientService = new ClientServiceImpl(clientRepository);
+        OrderFileWriter orderFileWriter = new OrderFileWriter("orders.json");
+        InvoiceGenerator invoiceGenerator = new InvoiceGeneratorImpl(invoiceRepository);
+        ExecutorService asyncExecutor = Executors.newFixedThreadPool(4);
+        OrderServiceImpl orderService = new OrderServiceImpl(orderRepository, clientRepository, productRepository, cartService, invoiceGenerator, orderFileWriter, discountService, asyncExecutor);
+        ProductService productService = new ProductServiceImpl(productRepository);
+
+        Scanner scanner = new Scanner(System.in);
+        AuthHandler authHandler = new AuthHandler(clientService, scanner);
+        ProductHandler productHandler = new ProductHandler(productService, scanner);
+        CartHandler cartHandler = new CartHandler(cartService, productService, scanner);
+        OrderHandler orderHandler = new OrderHandler(orderService, scanner);
+
+        ConsoleApp consoleApp = new ConsoleApp(authHandler, productHandler, cartHandler, orderHandler, scanner);
+
+        discountService.addNewPromoCode("VIP10", new PercentageDiscountPolicy(new BigDecimal("0.10")));
+        discountService.addNewPromoCode("BOGACZ200", new ThresholdDiscountPolicy(new BigDecimal("5000"), new BigDecimal("200")));
+
+        List<Product> products = List.of(
+                new Computer("Dell Inspiron 15", new BigDecimal("2999.99"), 10),
+                new Computer("Lenovo ThinkPad E14", new BigDecimal("4299.99"), 5),
+                new Smartphone("Samsung Galaxy S24", new BigDecimal("3999.99"), 15),
+                new Smartphone("iPhone 15", new BigDecimal("4999.99"), 8),
+                new Electronics("Logitech MX Master 3S", new BigDecimal("399.99"), 20),
+                new Electronics("Samsung Odyssey G5", new BigDecimal("1299.99"), 7),
+                new Electronics("Sony WH-1000XM5", new BigDecimal("1499.99"), 12)
+        );
+        products.forEach(productService::addProduct);
+
+        consoleApp.run();
+        orderService.shutdown();
+    }
+}

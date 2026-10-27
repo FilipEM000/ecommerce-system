@@ -1,0 +1,12 @@
+[ {
+  "id" : 0,
+  "clientName" : "Fililp",
+  "cost" : 16399.96,
+  "orderDate" : "2026-06-23 20:27:14 CEST",
+  "items" : [ {
+    "name" : "Samsung Galaxy S24",
+    "type" : "SMARTPHONE",
+    "price" : 4099.99,
+    "quantity" : 4
+  } ]
+} ]

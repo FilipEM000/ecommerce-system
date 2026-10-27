@@ -1,0 +1,19 @@
+package order.mapper;
+
+import order.dto.OrderDto;
+import order.entity.Order;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class OrderMapper {
+    public static OrderDto mapToDto(Order order, String invoiceNumber) {
+        return new OrderDto(
+                order.getId(),
+                order.getClient().getName(),
+                order.getCost(),
+                order.getOrderDate(),
+                invoiceNumber
+        );
+    }
+}
